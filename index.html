@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vid2Quiz — Turn YouTube Videos into Quizzes in Seconds</title>
+<meta name="description" content="Paste a YouTube link, get an AI-generated quiz instantly. Free, no signup required. Perfect for students, teachers, and lifelong learners.">
+<meta name="keywords" content="youtube to quiz, video to quiz, ai quiz generator, youtube link into quiz, pdf to quiz">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #FAFAF8;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #6B6B6B;
+  --text-muted: #9CA3AF;
+  --accent: #FF6B35;
+  --accent-light: #FFF0EA;
+  --accent-hover: #E85A27;
+  --green: #22C55E;
+  --green-light: #ECFDF5;
+  --red: #EF4444;
+  --red-light: #FEF2F2;
+  --blue: #3B82F6;
+  --blue-light: #EFF6FF;
+  --border: #E8E8E4;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.06);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.08);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ===== NAV ===== */
+nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(250,250,248,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+}
+.nav-inner {
+  max-width: 1100px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 60px;
+}
+.logo {
+  font-family: 'Instrument Serif', serif;
+  font-size: 26px; font-weight: 400;
+  color: var(--text-primary);
+  text-decoration: none;
+  letter-spacing: -0.5px;
+}
+.logo span { color: var(--accent); }
+.nav-credits {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 14px; color: var(--text-secondary);
+  background: var(--accent-light);
+  padding: 6px 14px; border-radius: 20px;
+}
+.nav-credits svg { flex-shrink: 0; }
+
+/* ===== HERO ===== */
+.hero {
+  padding: 120px 24px 60px;
+  text-align: center;
+  max-width: 780px; margin: 0 auto;
+}
+.badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--green-light);
+  color: #16A34A;
+  font-size: 13px; font-weight: 500;
+  padding: 6px 14px; border-radius: 20px;
+  margin-bottom: 24px;
+}
+.badge::before {
+  content: ''; width: 6px; height: 6px;
+  background: #22C55E; border-radius: 50%;
+  animation: pulse-dot 2s infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+h1 {
+  font-family: 'Instrument Serif', serif;
+  font-size: clamp(38px, 6vw, 60px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -1.5px;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+h1 em {
+  font-style: italic;
+  color: var(--accent);
+}
+.hero p {
+  font-size: 18px;
+  color: var(--text-secondary);
+  max-width: 520px; margin: 0 auto 40px;
+}
+
+/* ===== INPUT BOX ===== */
+.input-section {
+  max-width: 640px; margin: 0 auto;
+}
+.input-box {
+  position: relative;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+.input-box:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(255,107,53,0.1), 0 4px 20px rgba(255,107,53,0.15);
+}
+.input-row {
+  display: flex; align-items: center;
+  padding: 6px 6px 6px 20px;
+}
+#url-input {
+  flex: 1;
+  border: none; outline: none;
+  font-size: 16px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text-primary);
+  background: transparent;
+  padding: 14px 0;
+}
+#url-input::placeholder { color: var(--text-muted); }
+#generate-btn {
+  flex-shrink: 0;
+  background: var(--accent);
+  color: white;
+  border: none; outline: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px; font-weight: 700;
+  padding: 14px 28px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex; align-items: center; gap: 8px;
+}
+#generate-btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+#generate-btn:active { transform: translateY(0); }
+#generate-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+.input-hint {
+  font-size: 13px; color: var(--text-muted);
+  margin-top: 12px; text-align: center;
+}
+
+/* ===== PROGRESS ===== */
+.progress-section {
+  display: none;
+  max-width: 640px; margin: 24px auto 0;
+  text-align: center;
+}
+.progress-bar-track {
+  height: 4px; background: var(--border);
+  border-radius: 4px; overflow: hidden;
+  margin-bottom: 12px;
+}
+.progress-bar-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--accent), #FF9F73);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+.progress-text {
+  font-size: 14px; color: var(--text-secondary);
+}
+
+/* ===== DEMO VIDEOS ===== */
+.demo-section {
+  max-width: 640px; margin: 32px auto 0;
+}
+.demo-label {
+  font-size: 13px; color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+.demo-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.demo-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+.demo-card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+.demo-card .demo-icon {
+  font-size: 20px; margin-bottom: 8px;
+}
+.demo-card .demo-title {
+  font-size: 13px; font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.3;
+  margin-bottom: 4px;
+}
+.demo-card .demo-meta {
+  font-size: 11px; color: var(--text-muted);
+}
+
+/* ===== QUIZ RESULTS ===== */
+.quiz-section {
+  display: none;
+  max-width: 640px; margin: 40px auto 0;
+  padding: 0 24px;
+}
+.quiz-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 24px;
+}
+.quiz-header h2 {
+  font-family: 'Instrument Serif', serif;
+  font-size: 28px; font-weight: 400;
+}
+.quiz-score {
+  font-size: 14px; color: var(--text-secondary);
+  background: var(--blue-light);
+  padding: 6px 14px; border-radius: 20px;
+}
+
+.quiz-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-sm);
+  animation: slideUp 0.4s ease both;
+}
+.quiz-card:nth-child(2) { animation-delay: 0.08s; }
+.quiz-card:nth-child(3) { animation-delay: 0.16s; }
+.quiz-card:nth-child(4) { animation-delay: 0.24s; }
+.quiz-card:nth-child(5) { animation-delay: 0.32s; }
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.quiz-card .q-number {
+  font-size: 12px; font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.quiz-card .q-text {
+  font-size: 17px; font-weight: 500;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+.q-options { display: flex; flex-direction: column; gap: 10px; }
+.q-option {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 18px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-size: 15px;
+}
+.q-option:hover {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+.q-option .opt-letter {
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 8px;
+  background: var(--bg);
+  font-size: 13px; font-weight: 700;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+.q-option.selected {
+  border-color: var(--blue);
+  background: var(--blue-light);
+}
+.q-option.selected .opt-letter {
+  background: var(--blue); color: white;
+}
+.q-option.correct {
+  border-color: var(--green);
+  background: var(--green-light);
+}
+.q-option.correct .opt-letter {
+  background: var(--green); color: white;
+}
+.q-option.wrong {
+  border-color: var(--red);
+  background: var(--red-light);
+}
+.q-option.wrong .opt-letter {
+  background: var(--red); color: white;
+}
+.q-option.disabled { pointer-events: none; }
+
+.q-explanation {
+  display: none;
+  margin-top: 16px;
+  padding: 14px 18px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* ===== HOW IT WORKS ===== */
+.how-section {
+  max-width: 800px; margin: 80px auto 0;
+  padding: 0 24px;
+  text-align: center;
+}
+.how-section h2 {
+  font-family: 'Instrument Serif', serif;
+  font-size: 36px; font-weight: 400;
+  margin-bottom: 48px;
+}
+.how-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  text-align: center;
+}
+.how-step .step-num {
+  width: 48px; height: 48px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--accent-light);
+  color: var(--accent);
+  font-weight: 700; font-size: 18px;
+  border-radius: 14px;
+  margin: 0 auto 16px;
+}
+.how-step h3 {
+  font-size: 17px; font-weight: 700;
+  margin-bottom: 8px;
+}
+.how-step p {
+  font-size: 14px; color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ===== USE CASES ===== */
+.use-section {
+  max-width: 800px; margin: 80px auto 0;
+  padding: 0 24px;
+  text-align: center;
+}
+.use-section h2 {
+  font-family: 'Instrument Serif', serif;
+  font-size: 36px; font-weight: 400;
+  margin-bottom: 16px;
+}
+.use-section > p {
+  color: var(--text-secondary);
+  margin-bottom: 40px;
+}
+.use-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px; text-align: left;
+}
+.use-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+}
+.use-card .use-emoji { font-size: 28px; margin-bottom: 12px; }
+.use-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+.use-card p { font-size: 14px; color: var(--text-secondary); line-height: 1.5; }
+
+/* ===== CTA ===== */
+.cta-section {
+  max-width: 600px; margin: 80px auto 0;
+  padding: 0 24px; text-align: center;
+}
+.cta-box {
+  background: var(--text-primary);
+  color: white;
+  border-radius: 24px;
+  padding: 56px 40px;
+}
+.cta-box h2 {
+  font-family: 'Instrument Serif', serif;
+  font-size: 32px; font-weight: 400;
+  margin-bottom: 12px;
+}
+.cta-box p {
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 28px;
+}
+.cta-box a {
+  display: inline-block;
+  background: var(--accent);
+  color: white;
+  text-decoration: none;
+  font-weight: 700;
+  padding: 14px 32px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+.cta-box a:hover { background: var(--accent-hover); transform: translateY(-1px); }
+
+/* ===== FOOTER ===== */
+footer {
+  max-width: 800px; margin: 60px auto 0;
+  padding: 24px 24px 40px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+}
+footer a { color: var(--text-secondary); text-decoration: none; }
+footer a:hover { color: var(--accent); }
+
+/* ===== SKELETON LOADING ===== */
+.skeleton-section {
+  display: none;
+  max-width: 640px; margin: 24px auto 0;
+  padding: 0 24px;
+}
+.skeleton-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin-bottom: 16px;
+  animation: skeletonPulse 1.5s ease infinite;
+}
+.skel-line {
+  height: 14px;
+  background: linear-gradient(90deg, var(--border) 25%, #f0f0ec 50%, var(--border) 75%);
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.8s ease infinite;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+.skel-line.short { width: 35%; }
+.skel-line.medium { width: 80%; }
+.skel-line.long { width: 100%; }
+.skel-line.option { height: 48px; margin-bottom: 10px; }
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+@keyframes skeletonShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ===== MODAL ===== */
+.modal-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(6px);
+  z-index: 999;
+  align-items: center; justify-content: center;
+  padding: 24px;
+}
+.modal-overlay.show { display: flex; }
+.modal-box {
+  background: var(--bg-card);
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 420px; width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  animation: modalIn 0.3s ease;
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.modal-box .modal-emoji { font-size: 48px; margin-bottom: 16px; }
+.modal-box h3 {
+  font-family: 'Instrument Serif', serif;
+  font-size: 24px; font-weight: 400;
+  margin-bottom: 10px;
+}
+.modal-box p {
+  font-size: 15px; color: var(--text-secondary);
+  line-height: 1.5; margin-bottom: 24px;
+}
+.modal-box .modal-btn {
+  display: inline-block;
+  background: var(--accent); color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px; font-weight: 700;
+  padding: 14px 32px; border-radius: 12px;
+  border: none; cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 12px;
+}
+.modal-box .modal-btn:hover { background: var(--accent-hover); }
+.modal-box .modal-close {
+  display: block;
+  font-size: 13px; color: var(--text-muted);
+  cursor: pointer; border: none; background: none;
+  font-family: 'DM Sans', sans-serif;
+}
+.modal-box .modal-close:hover { color: var(--text-secondary); }
+
+/* ===== RESULT SUMMARY ===== */
+.result-card {
+  background: linear-gradient(135deg, #1A1A1A 0%, #2D2D2D 100%);
+  color: white;
+  border-radius: var(--radius);
+  padding: 36px;
+  margin-top: 24px;
+  text-align: center;
+  animation: slideUp 0.5s ease both;
+}
+.result-card .result-score {
+  font-family: 'Instrument Serif', serif;
+  font-size: 56px; font-weight: 400;
+  margin-bottom: 4px;
+}
+.result-card .result-label {
+  font-size: 14px; color: rgba(255,255,255,0.5);
+  margin-bottom: 20px;
+}
+.result-card .result-msg {
+  font-size: 18px; font-weight: 500;
+  margin-bottom: 24px;
+}
+.result-card .result-actions {
+  display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+}
+.result-card .result-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 24px; border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px; font-weight: 600;
+  cursor: pointer; border: none;
+  transition: all 0.2s ease;
+}
+.result-btn.primary { background: var(--accent); color: white; }
+.result-btn.primary:hover { background: var(--accent-hover); }
+.result-btn.secondary { background: rgba(255,255,255,0.15); color: white; }
+.result-btn.secondary:hover { background: rgba(255,255,255,0.25); }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 640px) {
+  .how-steps, .use-cards, .demo-cards { grid-template-columns: 1fr; }
+  .input-row { flex-direction: column; padding: 12px; }
+  #url-input { width: 100%; padding: 12px 8px; text-align: center; }
+  #generate-btn { width: 100%; justify-content: center; padding: 16px; }
+  .cta-box { padding: 40px 24px; }
+  .hero { padding: 100px 24px 40px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="logo">Vid2<span>Quiz</span></a>
+    <div class="nav-credits">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="2.5" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      <span id="credits-display">3 free left today</span>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="badge">Free &middot; No signup required</div>
+  <h1>YouTube video to <em>quiz,</em> in&nbsp;10&nbsp;seconds</h1>
+  <p>Paste any YouTube link. AI extracts key concepts and generates interactive quiz questions instantly.</p>
+  
+  <div class="input-section">
+    <div class="input-box">
+      <div class="input-row">
+        <input type="text" id="url-input" placeholder="Paste YouTube link here..." autocomplete="off">
+        <button id="generate-btn" onclick="generateQuiz()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          Generate
+        </button>
+      </div>
+    </div>
+    <p class="input-hint">Works with any YouTube video that has subtitles or captions</p>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="progress-section" id="progress-section">
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" id="progress-fill"></div>
+    </div>
+    <p class="progress-text" id="progress-text">Reading video subtitles...</p>
+  </div>
+
+  <!-- SKELETON LOADING -->
+  <div class="skeleton-section" id="skeleton-section">
+    <div class="skeleton-card">
+      <div class="skel-line short"></div>
+      <div class="skel-line long"></div>
+      <div class="skel-line option"></div>
+      <div class="skel-line option"></div>
+      <div class="skel-line option"></div>
+    </div>
+    <div class="skeleton-card">
+      <div class="skel-line short"></div>
+      <div class="skel-line medium"></div>
+      <div class="skel-line option"></div>
+      <div class="skel-line option"></div>
+    </div>
+  </div>
+
+  <!-- DEMO -->
+  <div class="demo-section" id="demo-section">
+    <p class="demo-label">Try a demo</p>
+    <div class="demo-cards">
+      <div class="demo-card" onclick="loadDemo('science')">
+        <div class="demo-icon">🧬</div>
+        <div class="demo-title">How CRISPR Works</div>
+        <div class="demo-meta">Science &middot; 12 min</div>
+      </div>
+      <div class="demo-card" onclick="loadDemo('history')">
+        <div class="demo-icon">🏛️</div>
+        <div class="demo-title">Fall of the Roman Empire</div>
+        <div class="demo-meta">History &middot; 18 min</div>
+      </div>
+      <div class="demo-card" onclick="loadDemo('business')">
+        <div class="demo-icon">📈</div>
+        <div class="demo-title">Startup Fundraising 101</div>
+        <div class="demo-meta">Business &middot; 15 min</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ RESULTS -->
+<section class="quiz-section" id="quiz-section"></section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section">
+  <h2>How it works</h2>
+  <div class="how-steps">
+    <div class="how-step">
+      <div class="step-num">1</div>
+      <h3>Paste a link</h3>
+      <p>Copy any YouTube URL and paste it into the input box above.</p>
+    </div>
+    <div class="how-step">
+      <div class="step-num">2</div>
+      <h3>AI reads the video</h3>
+      <p>Our AI extracts subtitles, identifies core concepts, and understands the topic.</p>
+    </div>
+    <div class="how-step">
+      <div class="step-num">3</div>
+      <h3>Take the quiz</h3>
+      <p>Get 5 interactive questions with instant feedback and explanations.</p>
+    </div>
+  </div>
+</section>
+
+<!-- USE CASES -->
+<section class="use-section">
+  <h2>Built for learners like you</h2>
+  <p>Whether you're studying for exams or teaching a class, Vid2Quiz helps you learn faster.</p>
+  <div class="use-cards">
+    <div class="use-card">
+      <div class="use-emoji">🎓</div>
+      <h3>Students</h3>
+      <p>Turn lecture recordings into practice tests. Study smarter with active recall, not passive rewatching.</p>
+    </div>
+    <div class="use-card">
+      <div class="use-emoji">👩‍🏫</div>
+      <h3>Teachers</h3>
+      <p>Create quizzes from educational videos in seconds. Save hours of manual question writing.</p>
+    </div>
+    <div class="use-card">
+      <div class="use-emoji">🧠</div>
+      <h3>Lifelong Learners</h3>
+      <p>Actually remember what you watch. Test yourself on TED Talks, tutorials, and documentaries.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-box">
+    <h2>Stop watching. Start learning.</h2>
+    <p>3 free quizzes per day. No account needed.</p>
+    <a href="#" onclick="document.getElementById('url-input').focus(); window.scrollTo({top:0,behavior:'smooth'}); return false;">Try it now — it's free</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>&copy; 2026 Vid2Quiz &middot; <a href="#">Privacy</a> &middot; <a href="#">Terms</a> &middot; Built for curious minds</p>
+</footer>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="credit-modal">
+  <div class="modal-box">
+    <div class="modal-emoji">🧠</div>
+    <h3>You're on a roll!</h3>
+    <p>You've used all 3 free quizzes today. Sign up to unlock 5 daily quizzes and save your quiz history.</p>
+    <button class="modal-btn" onclick="closeModal()">Create free account</button>
+    <button class="modal-close" onclick="closeModal()">Maybe later</button>
+  </div>
+</div>
+
+<script>
+// ===== Demo Quiz Data =====
+const demoQuizzes = {
+  science: {
+    title: "How CRISPR Works",
+    questions: [
+      {
+        q: "What does CRISPR stand for?",
+        options: [
+          "Clustered Regularly Interspaced Short Palindromic Repeats",
+          "Central Repository for Integrated Sequence Pattern Research",
+          "Cellular Response to Inherited Selective Protein Regulation",
+          "Coded Ribonucleic Instruction for Sequential Protein Replication"
+        ],
+        correct: 0,
+        explanation: "CRISPR stands for Clustered Regularly Interspaced Short Palindromic Repeats, which are sequences found in bacterial DNA that form the basis of gene-editing technology."
+      },
+      {
+        q: "Which protein acts as the 'molecular scissors' in the CRISPR-Cas9 system?",
+        options: ["Cas12", "RNA polymerase", "Cas9", "Helicase"],
+        correct: 2,
+        explanation: "Cas9 is the enzyme that acts as molecular scissors, cutting DNA at a specific location guided by a piece of RNA."
+      },
+      {
+        q: "Where was CRISPR originally discovered?",
+        options: ["In human cancer cells", "In bacterial immune systems", "In plant chloroplasts", "In viral genomes"],
+        correct: 1,
+        explanation: "CRISPR was first identified as part of bacterial immune systems, where bacteria use it to defend against viruses."
+      },
+      {
+        q: "What is the primary function of the guide RNA in CRISPR?",
+        options: [
+          "To cut the DNA strand",
+          "To repair the DNA after cutting",
+          "To direct Cas9 to the target DNA sequence",
+          "To replicate the modified gene"
+        ],
+        correct: 2,
+        explanation: "The guide RNA is designed to match a specific DNA sequence, leading the Cas9 protein to the exact location where the cut should be made."
+      },
+      {
+        q: "Which field has NOT been widely explored as a CRISPR application?",
+        options: [
+          "Treating genetic diseases",
+          "Creating disease-resistant crops",
+          "Generating nuclear energy",
+          "Developing new antibiotics"
+        ],
+        correct: 2,
+        explanation: "While CRISPR has applications in medicine, agriculture, and drug development, it is not used in nuclear energy generation."
+      }
+    ]
+  },
+  history: {
+    title: "Fall of the Roman Empire",
+    questions: [
+      {
+        q: "In what year did the Western Roman Empire officially fall?",
+        options: ["395 AD", "410 AD", "455 AD", "476 AD"],
+        correct: 3,
+        explanation: "The Western Roman Empire fell in 476 AD when the last emperor, Romulus Augustulus, was deposed by the Germanic leader Odoacer."
+      },
+      {
+        q: "Which of the following was a major internal factor in Rome's decline?",
+        options: [
+          "Overreliance on mercenary armies",
+          "Discovery of the Americas",
+          "Rise of Buddhism",
+          "Invention of gunpowder"
+        ],
+        correct: 0,
+        explanation: "Rome increasingly relied on foreign mercenaries rather than citizen-soldiers, which weakened loyalty and military effectiveness."
+      },
+      {
+        q: "Which event in 410 AD shocked the Roman world?",
+        options: ["Eruption of Vesuvius", "The sack of Rome by the Visigoths", "Julius Caesar's assassination", "The founding of Constantinople"],
+        correct: 1,
+        explanation: "In 410 AD, the Visigoths under Alaric sacked Rome — the first time the city had been captured in 800 years."
+      },
+      {
+        q: "What role did Emperor Diocletian play in the Empire's later history?",
+        options: [
+          "He reunited the empire permanently",
+          "He split the empire into Eastern and Western halves",
+          "He converted Rome to Christianity",
+          "He was the last emperor"
+        ],
+        correct: 1,
+        explanation: "Diocletian divided the empire into Eastern and Western administrative halves in 285 AD to make it more manageable."
+      },
+      {
+        q: "Which part of the Roman Empire survived the fall in 476 AD?",
+        options: ["The Western Empire", "The Northern Empire", "The Eastern (Byzantine) Empire", "None survived"],
+        correct: 2,
+        explanation: "The Eastern Roman Empire, known as the Byzantine Empire, survived for nearly another thousand years until 1453."
+      }
+    ]
+  },
+  business: {
+    title: "Startup Fundraising 101",
+    questions: [
+      {
+        q: "What is a 'seed round' in startup fundraising?",
+        options: [
+          "The final round before IPO",
+          "Early-stage funding to develop an idea into a product",
+          "Government grants for agriculture startups",
+          "Funding from customers pre-ordering a product"
+        ],
+        correct: 1,
+        explanation: "A seed round is typically the first significant round of funding, used to develop a minimum viable product and validate the business concept."
+      },
+      {
+        q: "What does 'valuation' mean in the context of fundraising?",
+        options: [
+          "The amount of debt a company owes",
+          "The estimated worth of a company",
+          "The total revenue earned",
+          "The founder's personal net worth"
+        ],
+        correct: 1,
+        explanation: "Valuation is the estimated total worth of a company, which determines how much equity investors receive for their investment."
+      },
+      {
+        q: "What is a 'pitch deck'?",
+        options: [
+          "A legal contract with investors",
+          "A presentation summarizing a startup's business plan",
+          "The physical office space of a startup",
+          "A financial auditing tool"
+        ],
+        correct: 1,
+        explanation: "A pitch deck is a short presentation (usually 10-15 slides) that gives investors an overview of the business, market opportunity, and team."
+      },
+      {
+        q: "What is equity dilution?",
+        options: [
+          "When a company's stock price drops",
+          "The reduction of existing owners' percentage when new shares are issued",
+          "Mixing different types of investments",
+          "The process of selling a company"
+        ],
+        correct: 1,
+        explanation: "Dilution occurs when a company issues new shares to investors, reducing the ownership percentage of existing shareholders."
+      },
+      {
+        q: "Which is typically the correct order of funding rounds?",
+        options: [
+          "Series A → Seed → Series B → IPO",
+          "Angel → Series C → Seed → Series A",
+          "Pre-seed → Seed → Series A → Series B",
+          "IPO → Series A → Series B → Seed"
+        ],
+        correct: 2,
+        explanation: "Startup funding typically progresses: Pre-seed → Seed → Series A → Series B → Series C → and eventually an IPO or acquisition."
+      }
+    ]
+  }
+};
+
+// ===== Credits System =====
+let credits = parseInt(localStorage.getItem('v2q_credits') || '3');
+let lastReset = localStorage.getItem('v2q_reset') || '';
+const today = new Date().toDateString();
+if (lastReset !== today) {
+  credits = 3;
+  localStorage.setItem('v2q_credits', '3');
+  localStorage.setItem('v2q_reset', today);
+}
+updateCredits();
+
+function updateCredits() {
+  document.getElementById('credits-display').textContent = 
+    credits > 0 ? `${credits} free left today` : 'No credits left';
+}
+
+function useCredit() {
+  if (credits <= 0) return false;
+  credits--;
+  localStorage.setItem('v2q_credits', credits.toString());
+  updateCredits();
+  return true;
+}
+
+// ===== Quiz Generation =====
+function generateQuiz() {
+  const url = document.getElementById('url-input').value.trim();
+  if (!url && !url.includes('youtu')) {
+    document.getElementById('url-input').focus();
+    return;
+  }
+  if (!useCredit()) {
+    showModal();
+    return;
+  }
+  startProgress('science');
+}
+
+function loadDemo(type) {
+  if (!useCredit()) {
+    showModal();
+    return;
+  }
+  document.getElementById('url-input').value = '🎬 Demo: ' + demoQuizzes[type].title;
+  startProgress(type);
+}
+
+function showModal() {
+  document.getElementById('credit-modal').classList.add('show');
+}
+function closeModal() {
+  document.getElementById('credit-modal').classList.remove('show');
+}
+
+// ===== Secret reset: click logo 3 times =====
+let logoClicks = 0;
+let logoTimer = null;
+document.querySelector('.logo').addEventListener('click', function(e) {
+  e.preventDefault();
+  logoClicks++;
+  clearTimeout(logoTimer);
+  logoTimer = setTimeout(() => { logoClicks = 0; }, 1500);
+  if (logoClicks >= 3) {
+    logoClicks = 0;
+    credits = 3;
+    localStorage.setItem('v2q_credits', '3');
+    updateCredits();
+    document.getElementById('credits-display').style.color = '#22C55E';
+    setTimeout(() => { document.getElementById('credits-display').style.color = ''; }, 1000);
+  }
+});
+
+function startProgress(quizType) {
+  const btn = document.getElementById('generate-btn');
+  btn.disabled = true;
+
+  const progress = document.getElementById('progress-section');
+  const skeleton = document.getElementById('skeleton-section');
+  const fill = document.getElementById('progress-fill');
+  const text = document.getElementById('progress-text');
+  const demo = document.getElementById('demo-section');
+  const quiz = document.getElementById('quiz-section');
+
+  score = 0;
+  answered = new Set();
+  totalQuestions = 0;
+
+  quiz.style.display = 'none';
+  quiz.innerHTML = '';
+  progress.style.display = 'block';
+  skeleton.style.display = 'block';
+  demo.style.display = 'none';
+  fill.style.width = '0%';
+
+  const steps = [
+    { pct: 20, msg: 'Extracting video subtitles...' },
+    { pct: 45, msg: 'Identifying key concepts...' },
+    { pct: 70, msg: 'Crafting tricky questions...' },
+    { pct: 90, msg: 'Adding answer explanations...' },
+    { pct: 100, msg: 'Your quiz is ready!' }
+  ];
+
+  let i = 0;
+  const interval = setInterval(() => {
+    if (i < steps.length) {
+      fill.style.width = steps[i].pct + '%';
+      text.textContent = steps[i].msg;
+      i++;
+    } else {
+      clearInterval(interval);
+      setTimeout(() => {
+        progress.style.display = 'none';
+        skeleton.style.display = 'none';
+        btn.disabled = false;
+        renderQuiz(demoQuizzes[quizType]);
+      }, 400);
+    }
+  }, 600);
+}
+
+// ===== Render Quiz =====
+function renderQuiz(data) {
+  const section = document.getElementById('quiz-section');
+  totalQuestions = data.questions.length;
+
+  let html = `
+    <div class="quiz-header">
+      <h2>${data.title}</h2>
+      <div class="quiz-score" id="quiz-score">0 / ${data.questions.length}</div>
+    </div>
+  `;
+
+  data.questions.forEach((q, qi) => {
+    html += `<div class="quiz-card" id="card-${qi}">
+      <div class="q-number">Question ${qi + 1}</div>
+      <div class="q-text">${q.q}</div>
+      <div class="q-options">`;
+    
+    const letters = ['A', 'B', 'C', 'D'];
+    q.options.forEach((opt, oi) => {
+      html += `<div class="q-option" data-qi="${qi}" data-oi="${oi}" onclick="selectAnswer(this, ${qi}, ${oi}, ${q.correct})">
+        <span class="opt-letter">${letters[oi]}</span>
+        <span>${opt}</span>
+      </div>`;
+    });
+
+    html += `</div>
+      <div class="q-explanation" id="explain-${qi}">💡 ${q.explanation}</div>
+    </div>`;
+  });
+
+  section.innerHTML = html;
+  section.style.display = 'block';
+  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+let score = 0;
+let answered = new Set();
+let totalQuestions = 0;
+
+function selectAnswer(el, qi, oi, correct) {
+  if (answered.has(qi)) return;
+  answered.add(qi);
+
+  const card = document.getElementById(`card-${qi}`);
+  const options = card.querySelectorAll('.q-option');
+  
+  options.forEach(opt => {
+    opt.classList.add('disabled');
+    const idx = parseInt(opt.dataset.oi);
+    if (idx === correct) opt.classList.add('correct');
+  });
+
+  if (oi !== correct) {
+    el.classList.add('wrong');
+  } else {
+    score++;
+  }
+
+  document.getElementById('quiz-score').textContent = `${score} / ${totalQuestions}`;
+  document.getElementById(`explain-${qi}`).style.display = 'block';
+
+  // Check if all questions answered → show result card
+  if (answered.size === totalQuestions) {
+    setTimeout(() => showResultCard(), 600);
+  }
+}
+
+function showResultCard() {
+  const pct = Math.round((score / totalQuestions) * 100);
+  let msg = '';
+  let emoji = '';
+  if (pct === 100) { msg = 'Perfect score! You really know your stuff.'; emoji = '🏆'; }
+  else if (pct >= 80) { msg = 'Great job! Almost perfect.'; emoji = '🎉'; }
+  else if (pct >= 60) { msg = 'Not bad! Room for improvement.'; emoji = '💪'; }
+  else { msg = 'Keep learning! Try watching the video again.'; emoji = '📚'; }
+
+  const resultHTML = `
+    <div class="result-card">
+      <div style="font-size:40px; margin-bottom:8px;">${emoji}</div>
+      <div class="result-score">${score}/${totalQuestions}</div>
+      <div class="result-label">${pct}% correct</div>
+      <div class="result-msg">${msg}</div>
+      <div class="result-actions">
+        <button class="result-btn primary" onclick="document.getElementById('url-input').value=''; document.getElementById('url-input').focus(); window.scrollTo({top:0,behavior:'smooth'});">Try another video</button>
+        <button class="result-btn secondary" onclick="window.scrollTo({top: document.getElementById('quiz-section').offsetTop, behavior:'smooth'});">Review answers</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('quiz-section').insertAdjacentHTML('beforeend', resultHTML);
+  document.querySelector('.result-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+</script>
+
+</body>
+</html>
