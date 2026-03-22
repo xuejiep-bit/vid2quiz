@@ -132,19 +132,28 @@ h1 em {
   box-shadow: 0 0 0 4px rgba(255,107,53,0.1), 0 4px 20px rgba(255,107,53,0.15);
 }
 .input-row {
-  display: flex; align-items: center;
-  padding: 6px 6px 6px 20px;
+  display: flex; flex-direction: column;
+  padding: 0;
 }
-#url-input {
-  flex: 1;
+#text-input {
+  width: 100%;
   border: none; outline: none;
-  font-size: 16px;
+  font-size: 15px;
   font-family: 'DM Sans', sans-serif;
   color: var(--text-primary);
   background: transparent;
-  padding: 14px 0;
+  padding: 18px 20px 12px;
+  resize: none;
+  min-height: 120px;
+  line-height: 1.6;
 }
-#url-input::placeholder { color: var(--text-muted); }
+#text-input::placeholder { color: var(--text-muted); }
+.input-bottom {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 8px 8px 20px;
+  border-top: 1px solid var(--border);
+}
+.char-count { font-size: 12px; color: var(--text-muted); }
 #generate-btn {
   flex-shrink: 0;
   background: var(--accent);
@@ -579,7 +588,7 @@ footer a:hover { color: var(--accent); }
 @media (max-width: 640px) {
   .how-steps, .use-cards, .demo-cards { grid-template-columns: 1fr; }
   .input-row { flex-direction: column; padding: 12px; }
-  #url-input { width: 100%; padding: 12px 8px; text-align: center; }
+  #text-input { min-height: 100px; }
   #generate-btn { width: 100%; justify-content: center; padding: 16px; }
   .cta-box { padding: 40px 24px; }
   .hero { padding: 100px 24px 40px; }
@@ -602,20 +611,36 @@ footer a:hover { color: var(--accent); }
 <!-- HERO -->
 <section class="hero">
   <div class="badge">Free &middot; No signup required</div>
-  <h1>YouTube video to <em>quiz,</em> in&nbsp;10&nbsp;seconds</h1>
-  <p>Paste any YouTube link. AI extracts key concepts and generates interactive quiz questions instantly.</p>
+  <h1>Any text to <em>quiz,</em> in&nbsp;10&nbsp;seconds</h1>
+  <p>Paste notes, articles, subtitles, or any learning content. AI generates interactive quiz questions instantly.</p>
   
   <div class="input-section">
     <div class="input-box">
       <div class="input-row">
-        <input type="text" id="url-input" placeholder="Paste YouTube link here..." autocomplete="off">
+        <textarea id="text-input" placeholder="Paste your study content here...&#10;&#10;Examples: YouTube video transcript, lecture notes, textbook excerpt, article text..." oninput="updateCharCount()"></textarea>
+      </div>
+      <div class="input-bottom">
+        <span class="char-count" id="char-count">0 characters</span>
         <button id="generate-btn" onclick="generateQuiz()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-          Generate
+          Generate Quiz
         </button>
       </div>
     </div>
-    <p class="input-hint">Works with any YouTube video that has subtitles or captions</p>
+
+    <!-- YouTube Tip -->
+    <details style="max-width:640px; margin:16px auto 0; text-align:left;">
+      <summary style="font-size:13px; color:var(--text-secondary); cursor:pointer; padding:8px 0;">
+        💡 Want to quiz yourself on a YouTube video? Here's how to get the transcript
+      </summary>
+      <div style="font-size:13px; color:var(--text-secondary); line-height:1.8; padding:12px 16px; background:var(--bg-card); border:1px solid var(--border); border-radius:10px; margin-top:8px;">
+        <strong>3 simple steps:</strong><br>
+        1. Open the YouTube video<br>
+        2. Click the <strong>"⋯" (More)</strong> button below the video → Select <strong>"Show transcript"</strong><br>
+        3. Copy all the text and paste it above<br>
+        <span style="color:var(--text-muted);">Works with any video that has captions or auto-generated subtitles.</span>
+      </div>
+    </details>
   </div>
 
   <!-- PROGRESS -->
@@ -675,18 +700,18 @@ footer a:hover { color: var(--accent); }
   <div class="how-steps">
     <div class="how-step">
       <div class="step-num">1</div>
-      <h3>Paste a link</h3>
-      <p>Copy any YouTube URL and paste it into the input box above.</p>
+      <h3>Paste any text</h3>
+      <p>YouTube transcripts, lecture notes, articles, textbook excerpts — any learning content works.</p>
     </div>
     <div class="how-step">
       <div class="step-num">2</div>
-      <h3>AI reads the video</h3>
-      <p>Our AI extracts subtitles, identifies core concepts, and understands the topic.</p>
+      <h3>AI creates your quiz</h3>
+      <p>Our AI identifies core concepts and generates 5 well-crafted questions with explanations.</p>
     </div>
     <div class="how-step">
       <div class="step-num">3</div>
-      <h3>Take the quiz</h3>
-      <p>Get 5 interactive questions with instant feedback and explanations.</p>
+      <h3>Learn by doing</h3>
+      <p>Take the quiz with instant feedback. Active recall beats passive reading every time.</p>
     </div>
   </div>
 </section>
@@ -719,7 +744,7 @@ footer a:hover { color: var(--accent); }
   <div class="cta-box">
     <h2>Stop watching. Start learning.</h2>
     <p>3 free quizzes per day. No account needed.</p>
-    <a href="#" onclick="document.getElementById('url-input').focus(); window.scrollTo({top:0,behavior:'smooth'}); return false;">Try it now — it's free</a>
+    <a href="#" onclick="document.getElementById('text-input').focus(); window.scrollTo({top:0,behavior:'smooth'}); return false;">Try it now — it's free</a>
   </div>
 </section>
 
@@ -924,21 +949,27 @@ function useCredit() {
 }
 
 // ===== CONFIG =====
-const WORKER_URL = 'https://vid2quiz-api.xuejiep.workers.dev'; // ← 部署Worker后替换这里
+const WORKER_URL = 'https://vid2quiz-api.xuejiep.workers.dev';
+
+// ===== Char count =====
+function updateCharCount() {
+  const text = document.getElementById('text-input').value;
+  document.getElementById('char-count').textContent = text.length + ' characters';
+}
 
 // ===== Quiz Generation =====
 function generateQuiz() {
-  const url = document.getElementById('url-input').value.trim();
-  if (!url || (!url.includes('youtu') && !url.includes('youtube'))) {
-    document.getElementById('url-input').focus();
-    document.getElementById('url-input').placeholder = 'Please paste a valid YouTube link...';
+  const text = document.getElementById('text-input').value.trim();
+  if (!text || text.length < 50) {
+    document.getElementById('text-input').focus();
+    document.getElementById('text-input').placeholder = 'Please paste at least a few sentences of content...';
     return;
   }
   if (!useCredit()) {
     showModal();
     return;
   }
-  startRealQuiz(url);
+  startRealQuiz(text);
 }
 
 function loadDemo(type) {
@@ -946,7 +977,7 @@ function loadDemo(type) {
     showModal();
     return;
   }
-  document.getElementById('url-input').value = '🎬 Demo: ' + demoQuizzes[type].title;
+  document.getElementById('text-input').value = '🎬 Loading demo...';
   startDemoQuiz(type);
 }
 
@@ -1036,17 +1067,16 @@ function startDemoQuiz(quizType) {
 }
 
 // ===== Real Quiz (API call) =====
-async function startRealQuiz(youtubeUrl) {
+async function startRealQuiz(textContent) {
   const ui = showLoadingUI();
 
-  // Animate progress while waiting for API
   ui.fill.style.width = '15%';
-  ui.text.textContent = 'Extracting video subtitles...';
+  ui.text.textContent = 'Analyzing your content...';
 
   const progressSteps = [
-    { pct: '30%', msg: 'Reading video content...', delay: 2000 },
-    { pct: '50%', msg: 'Identifying key concepts...', delay: 4000 },
-    { pct: '65%', msg: 'Crafting tricky questions...', delay: 6000 },
+    { pct: '30%', msg: 'Identifying key concepts...', delay: 2000 },
+    { pct: '50%', msg: 'Crafting tricky questions...', delay: 4000 },
+    { pct: '65%', msg: 'Adding answer explanations...', delay: 6000 },
     { pct: '80%', msg: 'Almost there...', delay: 9000 },
   ];
 
@@ -1061,7 +1091,7 @@ async function startRealQuiz(youtubeUrl) {
     const response = await fetch(WORKER_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url: youtubeUrl }),
+      body: JSON.stringify({ text: textContent }),
     });
 
     const data = await response.json();
@@ -1195,7 +1225,7 @@ function showResultCard() {
       <div class="result-label">${pct}% correct</div>
       <div class="result-msg">${msg}</div>
       <div class="result-actions">
-        <button class="result-btn primary" onclick="document.getElementById('url-input').value=''; document.getElementById('url-input').focus(); window.scrollTo({top:0,behavior:'smooth'});">Try another video</button>
+        <button class="result-btn primary" onclick="document.getElementById('text-input').value=''; document.getElementById('text-input').focus(); window.scrollTo({top:0,behavior:'smooth'});">Try another quiz</button>
         <button class="result-btn secondary" onclick="window.scrollTo({top: document.getElementById('quiz-section').offsetTop, behavior:'smooth'});">Review answers</button>
       </div>
     </div>
