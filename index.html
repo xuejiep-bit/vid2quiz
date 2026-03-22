@@ -923,18 +923,22 @@ function useCredit() {
   return true;
 }
 
+// ===== CONFIG =====
+const WORKER_URL = 'https://vid2quiz-api.xuejiep.workers.dev'; // ← 部署Worker后替换这里
+
 // ===== Quiz Generation =====
 function generateQuiz() {
   const url = document.getElementById('url-input').value.trim();
-  if (!url && !url.includes('youtu')) {
+  if (!url || (!url.includes('youtu') && !url.includes('youtube'))) {
     document.getElementById('url-input').focus();
+    document.getElementById('url-input').placeholder = 'Please paste a valid YouTube link...';
     return;
   }
   if (!useCredit()) {
     showModal();
     return;
   }
-  startProgress('science');
+  startRealQuiz(url);
 }
 
 function loadDemo(type) {
@@ -943,7 +947,7 @@ function loadDemo(type) {
     return;
   }
   document.getElementById('url-input').value = '🎬 Demo: ' + demoQuizzes[type].title;
-  startProgress(type);
+  startDemoQuiz(type);
 }
 
 function showModal() {
@@ -971,7 +975,8 @@ document.querySelector('.logo').addEventListener('click', function(e) {
   }
 });
 
-function startProgress(quizType) {
+// ===== Show loading UI =====
+function showLoadingUI() {
   const btn = document.getElementById('generate-btn');
   btn.disabled = true;
 
@@ -993,6 +998,19 @@ function startProgress(quizType) {
   demo.style.display = 'none';
   fill.style.width = '0%';
 
+  return { progress, skeleton, fill, text, btn };
+}
+
+function hideLoadingUI(ui) {
+  ui.progress.style.display = 'none';
+  ui.skeleton.style.display = 'none';
+  ui.btn.disabled = false;
+}
+
+// ===== Demo Quiz (fake progress) =====
+function startDemoQuiz(quizType) {
+  const ui = showLoadingUI();
+
   const steps = [
     { pct: 20, msg: 'Extracting video subtitles...' },
     { pct: 45, msg: 'Identifying key concepts...' },
@@ -1004,19 +1022,93 @@ function startProgress(quizType) {
   let i = 0;
   const interval = setInterval(() => {
     if (i < steps.length) {
-      fill.style.width = steps[i].pct + '%';
-      text.textContent = steps[i].msg;
+      ui.fill.style.width = steps[i].pct + '%';
+      ui.text.textContent = steps[i].msg;
       i++;
     } else {
       clearInterval(interval);
       setTimeout(() => {
-        progress.style.display = 'none';
-        skeleton.style.display = 'none';
-        btn.disabled = false;
+        hideLoadingUI(ui);
         renderQuiz(demoQuizzes[quizType]);
       }, 400);
     }
   }, 600);
+}
+
+// ===== Real Quiz (API call) =====
+async function startRealQuiz(youtubeUrl) {
+  const ui = showLoadingUI();
+
+  // Animate progress while waiting for API
+  ui.fill.style.width = '15%';
+  ui.text.textContent = 'Extracting video subtitles...';
+
+  const progressSteps = [
+    { pct: '30%', msg: 'Reading video content...', delay: 2000 },
+    { pct: '50%', msg: 'Identifying key concepts...', delay: 4000 },
+    { pct: '65%', msg: 'Crafting tricky questions...', delay: 6000 },
+    { pct: '80%', msg: 'Almost there...', delay: 9000 },
+  ];
+
+  const timers = progressSteps.map(step => 
+    setTimeout(() => {
+      ui.fill.style.width = step.pct;
+      ui.text.textContent = step.msg;
+    }, step.delay)
+  );
+
+  try {
+    const response = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: youtubeUrl }),
+    });
+
+    const data = await response.json();
+
+    // Clear pending progress timers
+    timers.forEach(t => clearTimeout(t));
+
+    if (!response.ok || data.error) {
+      ui.fill.style.width = '100%';
+      ui.text.textContent = data.error || 'Something went wrong. Please try again.';
+      ui.text.style.color = '#EF4444';
+      setTimeout(() => {
+        hideLoadingUI(ui);
+        ui.text.style.color = '';
+        document.getElementById('demo-section').style.display = 'block';
+        // Refund the credit since it failed
+        credits++;
+        localStorage.setItem('v2q_credits', credits.toString());
+        updateCredits();
+      }, 2500);
+      return;
+    }
+
+    // Success
+    ui.fill.style.width = '100%';
+    ui.text.textContent = 'Your quiz is ready!';
+
+    setTimeout(() => {
+      hideLoadingUI(ui);
+      renderQuiz(data.quiz);
+    }, 500);
+
+  } catch (err) {
+    console.error('API Error:', err);
+    timers.forEach(t => clearTimeout(t));
+    ui.fill.style.width = '100%';
+    ui.text.textContent = 'Network error. Please check your connection.';
+    ui.text.style.color = '#EF4444';
+    setTimeout(() => {
+      hideLoadingUI(ui);
+      ui.text.style.color = '';
+      document.getElementById('demo-section').style.display = 'block';
+      credits++;
+      localStorage.setItem('v2q_credits', credits.toString());
+      updateCredits();
+    }, 2500);
+  }
 }
 
 // ===== Render Quiz =====
