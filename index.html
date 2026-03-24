@@ -68,6 +68,10 @@ h1 em { font-style: italic; color: var(--accent); }
 #text-input::placeholder { color: var(--text-muted); }
 .input-bottom { display: flex; align-items: center; justify-content: space-between; padding: 8px 8px 8px 20px; border-top: 1px solid var(--border); }
 .char-count { font-size: 12px; color: var(--text-muted); }
+.upload-btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--text-secondary); cursor: pointer; transition: all 0.2s ease; }
+.upload-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+.input-bottom-left { display: flex; align-items: center; gap: 12px; }
+#file-upload { display: none; }
 #generate-btn { flex-shrink: 0; background: var(--accent); color: white; border: none; outline: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; padding: 14px 28px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 8px; }
 #generate-btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
 #generate-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
@@ -194,6 +198,8 @@ footer a:hover { color: var(--accent); }
   .steps-guide { flex-direction: column; align-items: center; }
   .step-arrow { transform: rotate(90deg); }
   #generate-btn { width: 100%; justify-content: center; }
+  .input-bottom { flex-direction: column; gap: 10px; }
+  .input-bottom-left { width: 100%; justify-content: space-between; }
   .cta-box { padding: 40px 24px; }
   .hero { padding: 100px 24px 30px; }
 }
@@ -225,7 +231,7 @@ footer a:hover { color: var(--accent); }
     </div>
     <span class="step-arrow">→</span>
     <div class="step-pill">
-      <strong>Step 2:</strong> Paste it below
+      <strong>Step 2:</strong> Paste or upload it below
     </div>
   </div>
 
@@ -236,7 +242,14 @@ footer a:hover { color: var(--accent); }
         <textarea id="text-input" placeholder="Paste your YouTube video transcript here...&#10;&#10;Tip: Use downsub.com to quickly grab subtitles from any YouTube video." oninput="updateCharCount()"></textarea>
       </div>
       <div class="input-bottom">
-        <span class="char-count" id="char-count">0 characters</span>
+        <div class="input-bottom-left">
+          <span class="char-count" id="char-count">0 characters</span>
+          <label class="upload-btn" for="file-upload">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Upload file
+          </label>
+          <input type="file" id="file-upload" accept=".txt,.srt,.vtt,.sub,.csv,.md" onchange="handleFileUpload(event)">
+        </div>
         <button id="generate-btn" onclick="generateQuiz()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
           Generate Quiz
@@ -325,8 +338,8 @@ footer a:hover { color: var(--accent); }
     </div>
     <div class="how-step">
       <div class="step-num">2</div>
-      <h3>Paste it here</h3>
-      <p>Copy the transcript text and paste it into the input box at the top of this page.</p>
+      <h3>Paste or upload</h3>
+      <p>Copy the transcript text and paste it into the input box, or click "Upload file" to load a downloaded subtitle file directly.</p>
     </div>
     <div class="how-step">
       <div class="step-num">3</div>
@@ -468,6 +481,20 @@ function useCredit() { if (credits <= 0) return false; credits--; localStorage.s
 const WORKER_URL = 'https://vid2quiz-api.xuejiep.workers.dev';
 
 function updateCharCount() { document.getElementById('char-count').textContent = document.getElementById('text-input').value.length + ' characters'; }
+
+function handleFileUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const text = e.target.result;
+    document.getElementById('text-input').value = text;
+    updateCharCount();
+    document.getElementById('text-input').scrollTop = 0;
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
 
 function generateQuiz() {
   const text = document.getElementById('text-input').value.trim();
