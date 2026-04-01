@@ -203,7 +203,7 @@ footer a:hover { color: var(--accent); }
     </div>
     <div class="nav-credits">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="2.5" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-      <span id="credits-display">3 free left today</span>
+      <span id="credits-display">5 free left today</span>
     </div>
   </div>
 </nav>
@@ -311,7 +311,7 @@ footer a:hover { color: var(--accent); }
     <div class="why-card">
       <div class="why-emoji">🆓</div>
       <h3>100% free, no account needed</h3>
-      <p>Get 3 free quizzes per day without signing up. No credit card, no email, no strings attached.</p>
+      <p>Get 5 free quizzes per day without signing up. No credit card, no email, no strings attached.</p>
     </div>
   </div>
 </section>
@@ -377,7 +377,7 @@ footer a:hover { color: var(--accent); }
     </div>
     <div class="faq-item">
       <button class="faq-question" onclick="toggleFaq(this)">Is Vid2Quiz really free?</button>
-      <div class="faq-answer"><p>Yes. You get 3 free quiz generations per day without creating an account. No credit card, no email address, no hidden fees. Just paste your transcript and start learning.</p></div>
+      <div class="faq-answer"><p>Yes. You get 5 free quiz generations per day without creating an account. No credit card, no email address, no hidden fees. Just paste your transcript and start learning.</p></div>
     </div>
     <div class="faq-item">
       <button class="faq-question" onclick="toggleFaq(this)">What types of questions does the AI generate?</button>
@@ -408,7 +408,7 @@ footer a:hover { color: var(--accent); }
 <section class="cta-section">
   <div class="cta-box">
     <h2>Stop watching. Start learning.</h2>
-    <p>Turn your next YouTube video into a quiz. 3 free per day, no signup needed.</p>
+    <p>Turn your next YouTube video into a quiz. 5 free per day, no signup needed.</p>
     <a href="#" onclick="document.getElementById('text-input').focus(); window.scrollTo({top:0,behavior:'smooth'}); return false;">Try it now — it's free</a>
   </div>
 </section>
@@ -423,7 +423,7 @@ footer a:hover { color: var(--accent); }
   <div class="modal-box">
     <div class="modal-emoji">🧠</div>
     <h3>You're on a roll!</h3>
-    <p>You've used all 3 free quizzes today. Sign up to unlock 5 daily quizzes and save your quiz history.</p>
+    <p>You've used all 5 free quizzes today. Sign up to unlock 10 daily quizzes and save your quiz history.</p>
     <button class="modal-btn" onclick="closeModal()">Create free account</button>
     <button class="modal-close" onclick="closeModal()">Maybe later</button>
   </div>
@@ -468,7 +468,7 @@ const demoQuizzes = {
 let credits = parseInt(localStorage.getItem('v2q_credits') || '3');
 let lastReset = localStorage.getItem('v2q_reset') || '';
 const today = new Date().toDateString();
-if (lastReset !== today) { credits = 3; localStorage.setItem('v2q_credits', '3'); localStorage.setItem('v2q_reset', today); }
+if (lastReset !== today) { credits = 5; localStorage.setItem('v2q_credits', '5'); localStorage.setItem('v2q_reset', today); }
 updateCredits();
 function updateCredits() { document.getElementById('credits-display').textContent = credits > 0 ? `${credits} free left today` : 'No credits left'; }
 function useCredit() { if (credits <= 0) return false; credits--; localStorage.setItem('v2q_credits', credits.toString()); updateCredits(); return true; }
@@ -513,7 +513,7 @@ let logoClicks = 0, logoTimer = null;
 document.querySelector('.logo').addEventListener('click', function(e) {
   e.preventDefault(); logoClicks++; clearTimeout(logoTimer);
   logoTimer = setTimeout(() => { logoClicks = 0; }, 1500);
-  if (logoClicks >= 3) { logoClicks = 0; credits = 3; localStorage.setItem('v2q_credits', '3'); updateCredits(); document.getElementById('credits-display').style.color = '#22C55E'; setTimeout(() => { document.getElementById('credits-display').style.color = ''; }, 1000); }
+  if (logoClicks >= 3) { logoClicks = 0; credits = 5; localStorage.setItem('v2q_credits', '5'); updateCredits(); document.getElementById('credits-display').style.color = '#22C55E'; setTimeout(() => { document.getElementById('credits-display').style.color = ''; }, 1000); }
 });
 
 // ===== Loading UI =====

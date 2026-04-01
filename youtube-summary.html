@@ -144,7 +144,7 @@ footer a:hover{color:var(--accent)}
     </div>
     <div class="nav-credits">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-      <span id="credits-display">3 free left today</span>
+      <span id="credits-display">5 free left today</span>
     </div>
   </div>
 </nav>
@@ -213,7 +213,7 @@ footer a:hover{color:var(--accent)}
     <div class="why-card"><div class="why-emoji">⏱️</div><h3>Save hours of watching time</h3><p>A 20-minute video summarized into key points you can read in 60 seconds. Perfect for research, studying, or catching up on content.</p></div>
     <div class="why-card"><div class="why-emoji">🌍</div><h3>Break language barriers</h3><p>Watch videos in any language and get summaries translated into your native language. Learn from global content without fluency.</p></div>
     <div class="why-card"><div class="why-emoji">📝</div><h3>Structured, not scattered</h3><p>AI organizes the content into key points, important concepts, and a main takeaway. Much clearer than raw subtitles.</p></div>
-    <div class="why-card"><div class="why-emoji">🆓</div><h3>Free with no signup</h3><p>3 free summaries per day. No account, no credit card, no commitment. Just paste and go.</p></div>
+    <div class="why-card"><div class="why-emoji">🆓</div><h3>Free with no signup</h3><p>5 free summaries per day. No account, no credit card, no commitment. Just paste and go.</p></div>
   </div>
 </section>
 
@@ -235,7 +235,7 @@ footer a:hover{color:var(--accent)}
   <div class="faq-list">
     <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">How does the YouTube video summarizer work?</button><div class="faq-answer"><p>You paste the video's transcript (subtitles) into our tool, and AI analyzes the content to extract the most important points, key concepts, and a main takeaway. The result is a structured, easy-to-read summary.</p></div></div>
     <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Can it translate summaries into other languages?</button><div class="faq-answer"><p>Yes! Select your preferred language from the dropdown before generating the summary. We support 12+ languages including Chinese, Spanish, French, Japanese, Korean, German, Arabic, and more.</p></div></div>
-    <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Is this free to use?</button><div class="faq-answer"><p>Yes. You get 3 free summaries per day without creating an account. No credit card or email required.</p></div></div>
+    <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Is this free to use?</button><div class="faq-answer"><p>Yes. You get 5 free summaries per day without creating an account. No credit card or email required.</p></div></div>
     <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">What types of videos work best?</button><div class="faq-answer"><p>Educational content works best — lectures, tutorials, TED Talks, documentaries, and explainer videos. The AI performs best with clear, informative content rather than casual vlogs or music videos.</p></div></div>
     <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Why do I need to copy the transcript manually?</button><div class="faq-answer"><p>Due to YouTube's technical restrictions, we cannot extract subtitles automatically. Using a free tool like downsub.com to grab the transcript takes about 10 seconds.</p></div></div>
     <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Can I also generate quizzes from videos?</button><div class="faq-answer"><p>Yes! Our <a href="/" style="color:var(--accent)">YouTube to Quiz Generator</a> turns video transcripts into interactive multiple-choice quizzes. Great for testing your understanding after watching.</p></div></div>
@@ -267,7 +267,7 @@ const WORKER_URL = 'https://vid2quiz-api.xuejiep.workers.dev';
 let credits = parseInt(localStorage.getItem('v2q_credits') || '3');
 let lastReset = localStorage.getItem('v2q_reset') || '';
 const today = new Date().toDateString();
-if (lastReset !== today) { credits = 3; localStorage.setItem('v2q_credits', '3'); localStorage.setItem('v2q_reset', today); }
+if (lastReset !== today) { credits = 5; localStorage.setItem('v2q_credits', '5'); localStorage.setItem('v2q_reset', today); }
 updateCredits();
 function updateCredits() { document.getElementById('credits-display').textContent = credits > 0 ? `${credits} free left today` : 'No credits left'; }
 function useCredit() { if (credits <= 0) return false; credits--; localStorage.setItem('v2q_credits', credits.toString()); updateCredits(); return true; }
@@ -279,13 +279,13 @@ let logoClicks = 0, logoTimer = null;
 document.querySelector('.logo').addEventListener('click', function(e) {
   e.preventDefault(); logoClicks++; clearTimeout(logoTimer);
   logoTimer = setTimeout(() => { logoClicks = 0; }, 1500);
-  if (logoClicks >= 3) { logoClicks = 0; credits = 3; localStorage.setItem('v2q_credits', '3'); updateCredits(); }
+  if (logoClicks >= 3) { logoClicks = 0; credits = 5; localStorage.setItem('v2q_credits', '5'); updateCredits(); }
 });
 
 async function generateSummary() {
   const text = document.getElementById('text-input').value.trim();
   if (!text || text.length < 50) { document.getElementById('text-input').focus(); return; }
-  if (!useCredit()) { alert('You have used all 3 free credits today.'); return; }
+  if (!useCredit()) { alert('You have used all 5 free credits today.'); return; }
 
   const language = document.getElementById('lang-select').value;
   const btn = document.getElementById('generate-btn'); btn.disabled = true;
