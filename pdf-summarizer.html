@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF Summarizer — Free AI Summary & Translation | Vid2Quiz</title>
+<meta name="description" content="Summarize any PDF or document instantly with AI. Get key points, important concepts, and translate the summary into your language. Free, no signup needed.">
+<meta name="keywords" content="pdf summarizer, document summarizer, ai pdf summary, summarize pdf, pdf summary generator, ai text summarizer">
+<meta name="google-site-verification" content="1WLhkGYgNzFlGW6WdOoCBg7fkv5yIkw_9UJzgxGsgWo" />
+<link rel="canonical" href="https://vid2quiz.com/pdf-summarizer.html" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+:root{--bg:#FAFAFA;--bg-card:#FFF;--text-primary:#111827;--text-secondary:#6B7280;--text-muted:#9CA3AF;--accent:#8B5CF6;--accent-light:#F5F3FF;--accent-hover:#7C3AED;--green:#22C55E;--green-light:#F0FDF4;--red:#EF4444;--red-light:#FEF2F2;--border:#E5E7EB;--shadow-sm:0 1px 2px rgba(0,0,0,0.05);--shadow-md:0 4px 24px rgba(0,0,0,0.06);--radius:16px;--radius-sm:12px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);color:var(--text-primary);line-height:1.7;overflow-x:hidden}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(250,250,250,0.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 32px}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{font-size:24px;font-weight:700;color:var(--text-primary);text-decoration:none}.logo span{color:#FF6B35}
+.nav-links{display:flex;gap:20px;align-items:center}
+.nav-links a{font-size:14px;font-weight:600;color:var(--text-secondary);text-decoration:none;padding:6px 12px;border-radius:8px;transition:all 0.2s}
+.nav-links a:hover,.nav-links a.active{color:var(--accent);background:var(--accent-light)}
+.nav-credits{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text-secondary);background:var(--accent-light);padding:8px 16px;border-radius:24px;font-weight:500}
+
+.hero{padding:88px 32px 40px;text-align:center;max-width:900px;margin:0 auto}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--accent-light);color:var(--accent);font-size:14px;font-weight:600;padding:8px 18px;border-radius:24px;margin-bottom:20px}
+h1{font-size:clamp(32px,5vw,52px);font-weight:700;line-height:1.15;letter-spacing:-1.5px;margin-bottom:20px}
+h1 em{font-style:normal;color:var(--accent)}
+.hero>p{font-size:19px;color:var(--text-secondary);max-width:600px;margin:0 auto 32px}
+
+/* TOOL BOX */
+.tool-box{max-width:760px;margin:0 auto;background:var(--bg-card);border:2px solid var(--border);border-radius:20px;box-shadow:var(--shadow-md);overflow:hidden}
+.tool-box:focus-within{border-color:var(--accent);box-shadow:0 0 0 4px rgba(139,92,246,0.08),0 8px 32px rgba(139,92,246,0.12)}
+.tab-bar{display:flex;border-bottom:1px solid var(--border);background:var(--bg)}
+.tab-btn{flex:1;padding:14px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;color:var(--text-muted);background:none;border:none;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;border-bottom:2px solid transparent}
+.tab-btn:hover{color:var(--text-primary)}.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);background:var(--bg-card)}
+.tab-content{display:none;padding:24px}.tab-content.active{display:block}
+
+.drop-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:48px 24px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--bg)}
+.drop-zone:hover,.drop-zone.dragover{border-color:var(--accent);background:var(--accent-light)}
+.drop-zone .dz-icon{font-size:40px;margin-bottom:12px}.drop-zone .dz-title{font-size:16px;font-weight:600;margin-bottom:6px}.drop-zone .dz-sub{font-size:13px;color:var(--text-muted)}
+.file-info{display:none;padding:16px;border-radius:var(--radius-sm);margin-top:16px;font-size:14px;font-weight:600}
+#pdf-upload{display:none}
+#text-input{width:100%;border:none;outline:none;font-size:16px;font-family:'DM Sans',sans-serif;color:var(--text-primary);background:transparent;resize:none;min-height:160px;line-height:1.7}
+#text-input::placeholder{color:var(--text-muted)}
+
+.input-options{display:flex;align-items:center;gap:12px;padding:12px 24px;border-top:1px solid var(--border);flex-wrap:wrap}
+.lang-select{padding:8px 14px;border-radius:10px;border:1px solid var(--border);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;color:var(--text-primary);background:var(--bg);cursor:pointer;outline:none}
+.tool-bottom{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;border-top:1px solid var(--border)}
+.char-count{font-size:13px;color:var(--text-muted);font-weight:500}
+#generate-btn{background:var(--accent);color:white;border:none;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:700;padding:16px 36px;border-radius:14px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:10px}
+#generate-btn:hover{background:var(--accent-hover);transform:translateY(-1px)}
+#generate-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+
+.progress-section{display:none;max-width:760px;margin:32px auto 0;text-align:center}
+.progress-bar-track{height:5px;background:var(--border);border-radius:5px;overflow:hidden;margin-bottom:16px}
+.progress-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#A78BFA);border-radius:5px;transition:width 0.4s}
+.progress-text{font-size:15px;color:var(--text-secondary);font-weight:500}
+
+.summary-section{display:none;max-width:760px;margin:48px auto 0;padding:0 24px}
+.summary-card{background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:36px;margin-bottom:20px;box-shadow:var(--shadow-sm);animation:slideUp 0.4s ease both}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.summary-card h2{font-size:24px;font-weight:700;margin-bottom:8px}
+.summary-tldr{font-size:17px;color:var(--text-secondary);line-height:1.7;padding:16px 20px;background:var(--accent-light);border-radius:var(--radius-sm);margin-bottom:24px}
+.summary-label{font-size:13px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px}
+.key-point{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--border);font-size:15px;line-height:1.6}.key-point:last-child{border-bottom:none}
+.key-point .kp-emoji{font-size:20px;flex-shrink:0;margin-top:2px}
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:8px}
+.concept-card{background:var(--bg);border-radius:var(--radius-sm);padding:16px}
+.concept-card .c-term{font-size:15px;font-weight:700;margin-bottom:4px}.concept-card .c-def{font-size:14px;color:var(--text-secondary);line-height:1.6}
+.takeaway-box{background:linear-gradient(135deg,#111827,#1F2937);color:white;border-radius:var(--radius);padding:28px;margin-top:20px;font-size:17px;line-height:1.7;text-align:center}
+.takeaway-box .ta-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,0.5);margin-bottom:8px}
+.summary-actions{display:flex;gap:12px;justify-content:center;margin-top:24px;flex-wrap:wrap}
+.action-btn{padding:12px 24px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg-card);color:var(--text-primary);transition:all 0.2s;display:flex;align-items:center;gap:6px}
+.action-btn:hover{border-color:var(--accent);color:var(--accent)}.action-btn.primary{background:var(--accent);color:white;border-color:var(--accent)}
+
+.content-section{max-width:960px;margin:0 auto;padding:100px 32px 0}
+.content-section h2{font-size:36px;font-weight:700;margin-bottom:16px;text-align:center;letter-spacing:-0.5px}
+.section-sub{color:var(--text-secondary);text-align:center;margin-bottom:48px;max-width:640px;margin-left:auto;margin-right:auto;font-size:17px}
+.content-section h3{font-size:18px;font-weight:700;margin-bottom:8px}
+
+.why-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.why-card{background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:32px}
+.why-card .why-emoji{font-size:32px;margin-bottom:16px}.why-card p{font-size:15px;color:var(--text-secondary);line-height:1.7}
+
+.how-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;text-align:center}
+.how-step .step-num{width:56px;height:56px;display:flex;align-items:center;justify-content:center;background:var(--accent-light);color:var(--accent);font-weight:700;font-size:20px;border-radius:16px;margin:0 auto 20px}
+.how-step p{font-size:15px;color:var(--text-secondary);line-height:1.7}
+
+.faq-list{max-width:720px;margin:0 auto}
+.faq-item{border-bottom:1px solid var(--border)}
+.faq-question{width:100%;background:none;border:none;padding:24px 0;font-family:'DM Sans',sans-serif;font-size:17px;font-weight:600;color:var(--text-primary);text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center;line-height:1.5}
+.faq-question::after{content:'+';font-size:24px;color:var(--text-muted);flex-shrink:0;margin-left:16px}
+.faq-item.open .faq-question::after{content:'−'}
+.faq-answer{max-height:0;overflow:hidden;transition:max-height 0.3s}
+.faq-answer p{padding:0 0 24px;font-size:16px;color:var(--text-secondary);line-height:1.8}
+
+.internal-links{max-width:760px;margin:60px auto 0;padding:0 32px;text-align:center}
+.internal-links h3{font-size:18px;font-weight:700;margin-bottom:16px;color:var(--text-secondary)}
+.internal-links a{display:inline-block;padding:10px 24px;border:1px solid var(--border);border-radius:12px;font-size:15px;font-weight:600;color:var(--text-primary);text-decoration:none;margin:4px;transition:all 0.2s}
+.internal-links a:hover{border-color:#FF6B35;color:#FF6B35;background:#FFF7F3}
+
+.cta-section{max-width:700px;margin:100px auto 0;padding:0 32px;text-align:center}
+.cta-box{background:var(--text-primary);color:white;border-radius:28px;padding:64px 48px}
+.cta-box h2{font-size:34px;font-weight:700;margin-bottom:14px}.cta-box p{color:rgba(255,255,255,0.6);margin-bottom:32px;font-size:17px}
+.cta-box a{display:inline-block;background:var(--accent);color:white;text-decoration:none;font-weight:700;padding:16px 36px;border-radius:14px;font-size:16px}
+
+footer{max-width:960px;margin:80px auto 0;padding:28px 32px 48px;text-align:center;font-size:14px;color:var(--text-muted);border-top:1px solid var(--border)}
+footer a{color:var(--text-secondary);text-decoration:none;font-weight:500}footer a:hover{color:var(--accent)}
+
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(8px);z-index:999;align-items:center;justify-content:center;padding:24px}
+.modal-overlay.show{display:flex}
+.modal-box{background:var(--bg-card);border-radius:24px;padding:48px;max-width:440px;width:100%;text-align:center}
+.modal-box .modal-emoji{font-size:52px;margin-bottom:20px}.modal-box h3{font-size:24px;font-weight:700;margin-bottom:12px}
+.modal-box p{font-size:16px;color:var(--text-secondary);line-height:1.6;margin-bottom:28px}
+.modal-box .modal-btn{display:inline-block;background:var(--accent);color:white;font-size:16px;font-weight:700;padding:16px 36px;border-radius:14px;border:none;cursor:pointer}
+.modal-box .modal-close{display:block;margin-top:14px;font-size:14px;color:var(--text-muted);cursor:pointer;border:none;background:none;font-family:'DM Sans',sans-serif}
+
+@media(max-width:768px){
+  .how-steps,.why-grid{grid-template-columns:1fr}
+  .tab-btn{font-size:13px;padding:12px 8px}
+  #generate-btn{width:100%;justify-content:center}
+  .tool-bottom{flex-direction:column;gap:12px}
+  .hero{padding:80px 20px 30px}.content-section{padding:60px 20px 0}
+  h1{font-size:32px}.content-section h2{font-size:28px}
+  .nav-links{display:none}.cta-box{padding:48px 28px}.concept-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<nav><div class="nav-inner">
+  <a href="/" class="logo">Vid2<span>Quiz</span></a>
+  <div class="nav-links">
+    <a href="/">YouTube to Quiz</a>
+    <a href="/pdf-to-quiz.html">PDF to Quiz</a>
+    <a href="/pdf-summarizer.html" class="active">PDF Summarizer</a>
+  </div>
+  <div class="nav-credits"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg><span id="credits-display">5 free left today</span></div>
+</div></nav>
+
+<section class="hero">
+  <div class="badge">AI-Powered &middot; Free &middot; Multi-language</div>
+  <h1>Free <em>PDF Summarizer</em> with Translation</h1>
+  <p>Upload a PDF or paste any text. AI extracts key points and translates the summary into your language instantly.</p>
+
+  <div class="tool-box">
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('doc')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Document</button>
+      <button class="tab-btn" onclick="switchTab('text')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg> Text</button>
+    </div>
+    <div class="tab-content active" id="tab-doc">
+      <div class="drop-zone" id="drop-zone" onclick="document.getElementById('pdf-upload').click()">
+        <div class="dz-icon">📄</div>
+        <div class="dz-title">Drop your PDF here or click to browse</div>
+        <div class="dz-sub">Supports PDF files up to 10MB</div>
+      </div>
+      <input type="file" id="pdf-upload" accept=".pdf,.txt,.md" onchange="handlePDFUpload(event)">
+      <div class="file-info" id="file-info"></div>
+    </div>
+    <div class="tab-content" id="tab-text">
+      <textarea id="text-input" placeholder="Paste any text here — articles, notes, book excerpts, reports...&#10;&#10;AI will extract key points and summarize it for you." oninput="updateCharCount()"></textarea>
+    </div>
+    <div class="input-options">
+      <span style="font-size:14px;font-weight:600;color:var(--text-secondary)">Translate to:</span>
+      <select class="lang-select" id="lang-select">
+        <option value="English">English</option>
+        <option value="Chinese (Simplified)">中文 (简体)</option>
+        <option value="Chinese (Traditional)">中文 (繁體)</option>
+        <option value="Spanish">Español</option>
+        <option value="French">Français</option>
+        <option value="German">Deutsch</option>
+        <option value="Japanese">日本語</option>
+        <option value="Korean">한국어</option>
+        <option value="Portuguese">Português</option>
+        <option value="Arabic">العربية</option>
+        <option value="Hindi">हिन्दी</option>
+        <option value="Russian">Русский</option>
+      </select>
+    </div>
+    <div class="tool-bottom">
+      <span class="char-count" id="char-count">Ready</span>
+      <button id="generate-btn" onclick="generateSummary()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> Summarize</button>
+    </div>
+  </div>
+</section>
+
+<div class="progress-section" id="progress-section">
+  <div class="progress-bar-track"><div class="progress-bar-fill" id="progress-fill"></div></div>
+  <p class="progress-text" id="progress-text">Analyzing document...</p>
+</div>
+
+<section class="summary-section" id="summary-section"></section>
+
+<section class="content-section">
+  <h2>Why use an AI PDF summarizer?</h2>
+  <p class="section-sub">Read less, understand more. AI extracts what matters from any document.</p>
+  <div class="why-grid">
+    <div class="why-card"><div class="why-emoji">⏱️</div><h3>Summarize a 50-page PDF in seconds</h3><p>Stop spending hours reading dense documents. Get structured key points, important concepts, and the main takeaway in one click.</p></div>
+    <div class="why-card"><div class="why-emoji">🌍</div><h3>Break language barriers instantly</h3><p>Upload a document in any language and get the summary translated into your native language. Supports 12+ languages including Chinese, Spanish, Japanese, and more.</p></div>
+    <div class="why-card"><div class="why-emoji">📝</div><h3>Structured, not just shortened</h3><p>Unlike basic summarizers that just cut text, our AI organizes content into key points, important terms, and a core takeaway you can act on.</p></div>
+    <div class="why-card"><div class="why-emoji">🔒</div><h3>Private and secure</h3><p>PDFs are processed in your browser. Only the extracted text is sent for summarization. Your documents are never stored on our servers.</p></div>
+  </div>
+</section>
+
+<section class="content-section">
+  <h2>How to summarize a PDF</h2>
+  <p class="section-sub">Three steps. Works with any text-based PDF or document.</p>
+  <div class="how-steps">
+    <div class="how-step"><div class="step-num">1</div><h3>Upload or paste</h3><p>Drag and drop a PDF, or switch to the Text tab and paste content from articles, notes, or reports.</p></div>
+    <div class="how-step"><div class="step-num">2</div><h3>Choose your language</h3><p>Select the language you want the summary in. The AI will translate everything automatically.</p></div>
+    <div class="how-step"><div class="step-num">3</div><h3>Read the summary</h3><p>Get structured key points, important concepts, and the main takeaway — all in your chosen language.</p></div>
+  </div>
+</section>
+
+<section class="content-section">
+  <h2>Frequently asked questions</h2>
+  <p class="section-sub">Everything about summarizing PDFs with AI.</p>
+  <div class="faq-list">
+    <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">What types of PDFs can I summarize?</button><div class="faq-answer"><p>Any text-based PDF works — research papers, textbook chapters, reports, articles, manuals, and study guides. Scanned image-only PDFs without selectable text may not work well. For best results, use PDFs where you can highlight and copy text.</p></div></div>
+    <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Can it translate the summary into other languages?</button><div class="faq-answer"><p>Yes! Select your preferred language before generating the summary. We support 12+ languages including Chinese, Spanish, French, Japanese, Korean, German, Arabic, and more. The entire summary — key points, concepts, and takeaway — will be in your chosen language.</p></div></div>
+    <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Is the PDF summarizer free?</button><div class="faq-answer"><p>Yes. You get 5 free summaries per day without creating an account. No credit card or email required.</p></div></div>
+    <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Is my PDF data private?</button><div class="faq-answer"><p>Yes. Your PDF is processed entirely in your browser to extract text. Only the extracted text is sent to our AI for summarization. We never store your documents or summaries on our servers.</p></div></div>
+    <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">How is this different from ChatGPT?</button><div class="faq-answer"><p>Our PDF summarizer gives you structured output — organized key points, defined concepts, and a clear takeaway. ChatGPT gives you a wall of text. We also handle PDF upload directly and support one-click translation, saving you time on formatting and copy-pasting.</p></div></div>
+    <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Can I also generate quizzes from my PDFs?</button><div class="faq-answer"><p>Yes! Our <a href="/pdf-to-quiz.html" style="color:var(--accent)">PDF to Quiz Generator</a> turns any document into interactive multiple-choice quizzes. Great for testing your understanding after reading. You can also try our <a href="/" style="color:var(--accent)">YouTube to Quiz</a> tool for video content.</p></div></div>
+  </div>
+</section>
+
+<div class="internal-links">
+  <h3>More AI learning tools</h3>
+  <a href="/">YouTube Link into Quiz →</a>
+  <a href="/pdf-to-quiz.html">PDF to Quiz Generator →</a>
+</div>
+
+<section class="cta-section">
+  <div class="cta-box">
+    <h2>Read less. Understand more.</h2>
+    <p>Summarize your next PDF in seconds. Free, no signup needed.</p>
+    <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">Try it now — it's free</a>
+  </div>
+</section>
+
+<footer><p>&copy; 2026 Vid2Quiz &middot; <a href="/">YouTube to Quiz</a> &middot; <a href="/pdf-to-quiz.html">PDF to Quiz</a> &middot; <a href="/pdf-summarizer.html">PDF Summarizer</a> &middot; <a href="#">Privacy</a></p></footer>
+
+<div class="modal-overlay" id="credit-modal"><div class="modal-box">
+  <div class="modal-emoji">🧠</div><h3>You're on a roll!</h3>
+  <p>You've used all 5 free summaries today. Sign up to unlock 10 daily summaries and save your history.</p>
+  <button class="modal-btn" onclick="closeModal()">Create free account</button>
+  <button class="modal-close" onclick="closeModal()">Maybe later</button>
+</div></div>
+
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+const WORKER_URL = 'https://vid2quiz-api.xuejiep.workers.dev';
+let extractedText = '', activeTab = 'doc';
+
+let credits = parseInt(localStorage.getItem('v2q_credits') || '5');
+let lastReset = localStorage.getItem('v2q_reset') || '';
+const today = new Date().toDateString();
+if (lastReset !== today) { credits = 5; localStorage.setItem('v2q_credits', '5'); localStorage.setItem('v2q_reset', today); }
+updateCredits();
+function updateCredits() { document.getElementById('credits-display').textContent = credits > 0 ? `${credits} free left today` : 'No credits left'; }
+function useCredit() { if (credits <= 0) return false; credits--; localStorage.setItem('v2q_credits', credits.toString()); updateCredits(); return true; }
+function updateCharCount() { document.getElementById('char-count').textContent = document.getElementById('text-input').value.length + ' characters'; }
+function showModal() { document.getElementById('credit-modal').classList.add('show'); }
+function closeModal() { document.getElementById('credit-modal').classList.remove('show'); }
+
+let logoClicks = 0, logoTimer = null;
+document.querySelector('.logo').addEventListener('click', function(e) {
+  e.preventDefault(); logoClicks++; clearTimeout(logoTimer);
+  logoTimer = setTimeout(() => { logoClicks = 0; }, 1500);
+  if (logoClicks >= 5) { logoClicks = 0; credits = 5; localStorage.setItem('v2q_credits', '5'); updateCredits(); }
+});
+
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', (i === 0 && tab === 'doc') || (i === 1 && tab === 'text')));
+  document.getElementById('tab-doc').classList.toggle('active', tab === 'doc');
+  document.getElementById('tab-text').classList.toggle('active', tab === 'text');
+}
+
+const dz = document.getElementById('drop-zone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('dragover'); if (e.dataTransfer.files[0]) processPDF(e.dataTransfer.files[0]); });
+
+function handlePDFUpload(e) { if (e.target.files[0]) processPDF(e.target.files[0]); e.target.value = ''; }
+
+async function processPDF(file) {
+  const info = document.getElementById('file-info');
+  if (file.name.endsWith('.txt') || file.name.endsWith('.md')) {
+    extractedText = await file.text();
+    info.style.display = 'block'; info.textContent = `✓ ${file.name} — ${extractedText.length} characters`;
+    info.style.color = '#16A34A'; info.style.background = 'var(--green-light)';
+    document.getElementById('char-count').textContent = extractedText.length + ' characters ready'; return;
+  }
+  info.style.display = 'block'; info.textContent = '⏳ Reading PDF...'; info.style.color = 'var(--text-secondary)'; info.style.background = 'var(--accent-light)';
+  try {
+    const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
+    let text = '';
+    for (let i = 1; i <= pdf.numPages; i++) { const page = await pdf.getPage(i); const c = await page.getTextContent(); text += c.items.map(item => item.str).join(' ') + '\n'; }
+    extractedText = text.trim();
+    if (extractedText.length < 50) { info.textContent = '⚠ Could not extract enough text. PDF might be image-based.'; info.style.color = '#EF4444'; info.style.background = 'var(--red-light)'; }
+    else { info.textContent = `✓ ${file.name} — ${extractedText.length} characters from ${pdf.numPages} pages`; info.style.color = '#16A34A'; info.style.background = 'var(--green-light)'; document.getElementById('char-count').textContent = extractedText.length + ' characters ready'; }
+  } catch (err) { info.textContent = '⚠ Error reading PDF.'; info.style.color = '#EF4444'; info.style.background = 'var(--red-light)'; }
+}
+
+async function generateSummary() {
+  let text = activeTab === 'doc' ? extractedText : document.getElementById('text-input').value.trim();
+  if (!text || text.length < 50) { alert('Please upload a PDF or paste at least a few sentences.'); return; }
+  if (!useCredit()) { showModal(); return; }
+
+  const language = document.getElementById('lang-select').value;
+  const btn = document.getElementById('generate-btn'); btn.disabled = true;
+  const progress = document.getElementById('progress-section');
+  const fill = document.getElementById('progress-fill');
+  const ptext = document.getElementById('progress-text');
+  const summary = document.getElementById('summary-section');
+  summary.style.display = 'none'; summary.innerHTML = '';
+  progress.style.display = 'block'; fill.style.width = '0%';
+
+  const steps = [
+    { pct: '20%', msg: 'Reading document...', delay: 1500 },
+    { pct: '45%', msg: 'Extracting key points...', delay: 3500 },
+    { pct: '65%', msg: 'Organizing concepts...', delay: 5500 },
+    { pct: '80%', msg: language !== 'English' ? `Translating to ${language}...` : 'Polishing summary...', delay: 7500 },
+  ];
+  const timers = steps.map(s => setTimeout(() => { fill.style.width = s.pct; ptext.textContent = s.msg; }, s.delay));
+
+  try {
+    const res = await fetch(WORKER_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text, mode: 'summary', language }) });
+    const data = await res.json(); timers.forEach(t => clearTimeout(t));
+    if (!res.ok || data.error) {
+      fill.style.width = '100%'; ptext.textContent = data.error || 'Error'; ptext.style.color = '#EF4444';
+      setTimeout(() => { progress.style.display = 'none'; ptext.style.color = ''; btn.disabled = false; credits++; localStorage.setItem('v2q_credits', credits.toString()); updateCredits(); }, 2500); return;
+    }
+    fill.style.width = '100%'; ptext.textContent = 'Summary ready!';
+    setTimeout(() => { progress.style.display = 'none'; btn.disabled = false; renderSummary(data.summary); }, 500);
+  } catch (err) {
+    timers.forEach(t => clearTimeout(t)); fill.style.width = '100%'; ptext.textContent = 'Network error.'; ptext.style.color = '#EF4444';
+    setTimeout(() => { progress.style.display = 'none'; ptext.style.color = ''; btn.disabled = false; credits++; localStorage.setItem('v2q_credits', credits.toString()); updateCredits(); }, 2500);
+  }
+}
+
+function renderSummary(s) {
+  const section = document.getElementById('summary-section');
+  let kp = ''; (s.keyPoints || []).forEach(k => { kp += `<div class="key-point"><span class="kp-emoji">${k.emoji||'•'}</span><span>${k.point}</span></div>`; });
+  let con = ''; (s.concepts || []).forEach(c => { con += `<div class="concept-card"><div class="c-term">${c.term}</div><div class="c-def">${c.definition}</div></div>`; });
+  section.innerHTML = `
+    <div class="summary-card"><h2>${s.title || 'Document Summary'}</h2><div class="summary-tldr">${s.tldr || ''}</div><div class="summary-label">Key Points</div>${kp}</div>
+    ${con ? `<div class="summary-card" style="animation-delay:0.1s"><div class="summary-label">Important Concepts</div><div class="concept-grid">${con}</div></div>` : ''}
+    ${s.takeaway ? `<div class="takeaway-box"><div class="ta-label">Main Takeaway</div>${s.takeaway}</div>` : ''}
+    <div class="summary-actions">
+      <button class="action-btn primary" onclick="window.scrollTo({top:0,behavior:'smooth'})">Summarize another document</button>
+      <button class="action-btn" onclick="window.location.href='/pdf-to-quiz.html'">Generate quiz from this PDF →</button>
+    </div>`;
+  section.style.display = 'block';
+  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function toggleFaq(btn) {
+  const item = btn.parentElement, answer = item.querySelector('.faq-answer'), isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i => { i.classList.remove('open'); i.querySelector('.faq-answer').style.maxHeight = '0'; });
+  if (!isOpen) { item.classList.add('open'); answer.style.maxHeight = answer.scrollHeight + 'px'; }
+}
+</script>
+</body>
+</html>
