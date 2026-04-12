@@ -178,7 +178,7 @@ footer a:hover{color:var(--accent)}
     </div>
     <div class="nav-credits">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="2.5" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-      <span id="credits-display">5 free left today</span>
+      <span id="credits-display">Free &middot; Unlimited</span>
     </div>
   </div>
 </nav>
@@ -243,7 +243,7 @@ footer a:hover{color:var(--accent)}
     <div class="why-card"><div class="why-emoji">📚</div><h3>Turn any document into practice questions</h3><p>Upload lecture slides, textbook chapters, research papers, or study guides. AI extracts the key concepts and creates targeted quiz questions.</p></div>
     <div class="why-card"><div class="why-emoji">⚡</div><h3>20 questions in 10 seconds</h3><p>Manual question writing takes 20-40 minutes. Our AI generates high-quality questions from any PDF or text in under 10 seconds.</p></div>
     <div class="why-card"><div class="why-emoji">🧠</div><h3>Learn faster with active recall</h3><p>Research shows testing yourself improves retention by 50% compared to re-reading. Quizzes force your brain to actively retrieve information.</p></div>
-    <div class="why-card"><div class="why-emoji">🆓</div><h3>Free, private, and instant</h3><p>5 free quizzes per day. Your documents are processed in the browser and never stored on our servers. No signup needed.</p></div>
+    <div class="why-card"><div class="why-emoji">🆓</div><h3>Free, private, and instant</h3><p>unlimited free quizzes. Your documents are processed in the browser and never stored on our servers. No signup needed.</p></div>
   </div>
 </section>
 
@@ -275,7 +275,7 @@ footer a:hover{color:var(--accent)}
   <p class="section-sub">Everything you need to know about converting PDFs to quizzes.</p>
   <div class="faq-list">
     <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">What types of PDF files work with this tool?</button><div class="faq-answer"><p>Any text-based PDF works — lecture slides, textbook chapters, research papers, articles, study guides, and notes. Scanned image-only PDFs without selectable text may not work well. For best results, use PDFs where you can highlight and copy text.</p></div></div>
-    <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Is the PDF to quiz generator really free?</button><div class="faq-answer"><p>Yes. You get 5 free quiz generations per day without creating an account. No credit card, no email, no hidden fees.</p></div></div>
+    <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Is the PDF to quiz generator really free?</button><div class="faq-answer"><p>Yes, it's completely free with unlimited usage. No account needed, no credit card, no daily limits.</p></div></div>
     <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Can I edit the generated quiz questions?</button><div class="faq-answer"><p>Currently the quiz is interactive — you can answer questions and see explanations. We are working on features to let you edit, export, and share quizzes.</p></div></div>
     <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">How accurate are the AI-generated questions?</button><div class="faq-answer"><p>The AI identifies key concepts and creates relevant questions with plausible answer options. Quality depends on the input — clear, informative content produces the best quizzes. We recommend reviewing questions for classroom use.</p></div></div>
     <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Is my PDF data private and secure?</button><div class="faq-answer"><p>Yes. Your PDF is processed entirely in your browser to extract text. Only the extracted text is sent to our AI for quiz generation. We never store your documents or generated content on our servers.</p></div></div>
@@ -308,7 +308,7 @@ footer a:hover{color:var(--accent)}
   <div class="modal-box">
     <div class="modal-emoji">🧠</div>
     <h3>You're on a roll!</h3>
-    <p>You've used all 5 free quizzes today. Sign up to unlock 10 daily quizzes and save your history.</p>
+    <p>This feature is coming soon. Create an account to save your quiz history.</p>
     <button class="modal-btn" onclick="closeModal()">Create free account</button>
     <button class="modal-close" onclick="closeModal()">Maybe later</button>
   </div>
@@ -327,7 +327,7 @@ let lastReset = localStorage.getItem('v2q_reset') || '';
 const today = new Date().toDateString();
 if (lastReset !== today) { credits = 5; localStorage.setItem('v2q_credits', '5'); localStorage.setItem('v2q_reset', today); }
 updateCredits();
-function updateCredits() { document.getElementById('credits-display').textContent = credits > 0 ? `${credits} free left today` : 'No credits left'; }
+function updateCredits() { document.getElementById('credits-display').textContent = 'Free · Unlimited'; }
 function useCredit() { if (credits <= 0) return false; credits--; localStorage.setItem('v2q_credits', credits.toString()); updateCredits(); return true; }
 function updateCharCount() { document.getElementById('char-count').textContent = document.getElementById('text-input').value.length + ' characters'; }
 
@@ -402,7 +402,7 @@ function generateQuiz() {
   if (activeTab === 'doc') { text = extractedText; }
   else { text = document.getElementById('text-input').value.trim(); }
   if (!text || text.length < 50) { alert('Please upload a document or paste at least a few sentences of text.'); return; }
-  if (!useCredit()) { showModal(); return; }
+  
   startQuiz(text);
 }
 
@@ -414,7 +414,7 @@ async function startQuiz(text) {
   const ptext = document.getElementById('progress-text');
   const quiz = document.getElementById('quiz-section');
 
-  score = 0; answered = new Set(); totalQ = 0;
+  score = 0; answered = new Set(); totalQ = 0; wrongAnswers = [];
   quiz.style.display = 'none'; quiz.innerHTML = '';
   progress.style.display = 'block'; skeleton.style.display = 'block'; fill.style.width = '0%';
 
@@ -445,6 +445,7 @@ async function startQuiz(text) {
 
 // Render
 function renderQuiz(data) {
+  currentQuizData = data;
   const section = document.getElementById('quiz-section');
   totalQ = data.questions.length;
   const L = ['A','B','C','D'];
@@ -458,11 +459,11 @@ function renderQuiz(data) {
   section.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-let score = 0, answered = new Set(), totalQ = 0;
+let score = 0, answered = new Set(), totalQ = 0, wrongAnswers = [], currentQuizData = null;
 function selectAnswer(el, qi, oi, correct) {
   if (answered.has(qi)) return; answered.add(qi);
   document.getElementById(`card-${qi}`).querySelectorAll('.q-option').forEach(o => { o.classList.add('disabled'); if (parseInt(o.dataset.oi) === correct) o.classList.add('correct'); });
-  if (oi !== correct) el.classList.add('wrong'); else score++;
+  if (oi !== correct) { el.classList.add('wrong'); wrongAnswers.push(qi); } else score++;
   document.getElementById('quiz-score').textContent = `${score} / ${totalQ}`;
   document.getElementById(`explain-${qi}`).style.display = 'block';
   if (answered.size === totalQ) setTimeout(showResult, 600);
@@ -475,10 +476,21 @@ function showResult() {
   else if (pct >= 80) { msg = 'Great job! Almost perfect.'; emoji = '🎉'; }
   else if (pct >= 60) { msg = 'Not bad! Review the explanations.'; emoji = '💪'; }
   else { msg = 'Keep studying! Re-read the material and try again.'; emoji = '📚'; }
+  const retryBtn = wrongAnswers.length > 0 ? `<button class="result-btn primary" onclick="retryWrongAnswers()">🔄 Retry ${wrongAnswers.length} wrong answer${wrongAnswers.length > 1 ? 's' : ''}</button>` : '';
   document.getElementById('quiz-section').insertAdjacentHTML('beforeend', `
-    <div class="result-card"><div style="font-size:40px;margin-bottom:8px">${emoji}</div><div class="result-score">${score}/${totalQ}</div><div class="result-label">${pct}% correct</div><div class="result-msg">${msg}</div><div class="result-actions"><button class="result-btn primary" onclick="window.scrollTo({top:0,behavior:'smooth'})">Try another document</button><button class="result-btn secondary" onclick="window.scrollTo({top:document.getElementById('quiz-section').offsetTop,behavior:'smooth'})">Review answers</button></div></div>
+    <div class="result-card"><div style="font-size:40px;margin-bottom:8px">${emoji}</div><div class="result-score">${score}/${totalQ}</div><div class="result-label">${pct}% correct</div><div class="result-msg">${msg}</div><div class="result-actions">${retryBtn}<button class="result-btn ${wrongAnswers.length > 0 ? 'secondary' : 'primary'}" onclick="window.scrollTo({top:0,behavior:'smooth'})">Try another document</button><button class="result-btn secondary" onclick="window.scrollTo({top:document.getElementById('quiz-section').offsetTop,behavior:'smooth'})">Review answers</button></div></div>
   `);
   document.querySelector('.result-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function retryWrongAnswers() {
+  if (!currentQuizData || wrongAnswers.length === 0) return;
+  const retryData = {
+    title: currentQuizData.title + ' — Retry',
+    questions: wrongAnswers.map(qi => currentQuizData.questions[qi])
+  };
+  score = 0; answered = new Set(); wrongAnswers = [];
+  renderQuiz(retryData);
 }
 
 function toggleFaq(btn) {

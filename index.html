@@ -204,7 +204,7 @@ footer a:hover { color: var(--accent); }
     </div>
     <div class="nav-credits">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="2.5" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-      <span id="credits-display">5 free left today</span>
+      <span id="credits-display">Free &middot; Unlimited</span>
     </div>
   </div>
 </nav>
@@ -312,7 +312,7 @@ footer a:hover { color: var(--accent); }
     <div class="why-card">
       <div class="why-emoji">🆓</div>
       <h3>100% free, no account needed</h3>
-      <p>Get 5 free quizzes per day without signing up. No credit card, no email, no strings attached.</p>
+      <p>Get completely free with no limits. No signup, no credit card, no daily caps.</p>
     </div>
   </div>
 </section>
@@ -378,7 +378,7 @@ footer a:hover { color: var(--accent); }
     </div>
     <div class="faq-item">
       <button class="faq-question" onclick="toggleFaq(this)">Is Vid2Quiz really free?</button>
-      <div class="faq-answer"><p>Yes. You get 5 free quiz generations per day without creating an account. No credit card, no email address, no hidden fees. Just paste your transcript and start learning.</p></div>
+      <div class="faq-answer"><p>Yes, it's completely free with unlimited usage. No account needed, no credit card, no daily limits. Just paste your transcript and start learning.</p></div>
     </div>
     <div class="faq-item">
       <button class="faq-question" onclick="toggleFaq(this)">What types of questions does the AI generate?</button>
@@ -410,7 +410,7 @@ footer a:hover { color: var(--accent); }
 <section class="cta-section">
   <div class="cta-box">
     <h2>Stop watching. Start learning.</h2>
-    <p>Turn your next YouTube video into a quiz. 5 free per day, no signup needed.</p>
+    <p>Turn your next YouTube video into a quiz. completely free, no signup needed.</p>
     <a href="#" onclick="document.getElementById('text-input').focus(); window.scrollTo({top:0,behavior:'smooth'}); return false;">Try it now — it's free</a>
   </div>
 </section>
@@ -425,7 +425,7 @@ footer a:hover { color: var(--accent); }
   <div class="modal-box">
     <div class="modal-emoji">🧠</div>
     <h3>You're on a roll!</h3>
-    <p>You've used all 5 free quizzes today. Sign up to unlock 10 daily quizzes and save your quiz history.</p>
+    <p>This feature is coming soon. Create an account to save your quiz history.</p>
     <button class="modal-btn" onclick="closeModal()">Create free account</button>
     <button class="modal-close" onclick="closeModal()">Maybe later</button>
   </div>
@@ -472,7 +472,7 @@ let lastReset = localStorage.getItem('v2q_reset') || '';
 const today = new Date().toDateString();
 if (lastReset !== today) { credits = 5; localStorage.setItem('v2q_credits', '5'); localStorage.setItem('v2q_reset', today); }
 updateCredits();
-function updateCredits() { document.getElementById('credits-display').textContent = credits > 0 ? `${credits} free left today` : 'No credits left'; }
+function updateCredits() { document.getElementById('credits-display').textContent = 'Free · Unlimited'; }
 function useCredit() { if (credits <= 0) return false; credits--; localStorage.setItem('v2q_credits', credits.toString()); updateCredits(); return true; }
 
 // ===== CONFIG =====
@@ -497,12 +497,12 @@ function handleFileUpload(event) {
 function generateQuiz() {
   const text = document.getElementById('text-input').value.trim();
   if (!text || text.length < 50) { document.getElementById('text-input').focus(); return; }
-  if (!useCredit()) { showModal(); return; }
+  
   startRealQuiz(text);
 }
 
 function loadDemo(type) {
-  if (!useCredit()) { showModal(); return; }
+  
   document.getElementById('text-input').value = '🎬 Loading demo...';
   startDemoQuiz(type);
 }
@@ -525,7 +525,7 @@ function showLoadingUI() {
   const skeleton = document.getElementById('skeleton-section');
   const quiz = document.getElementById('quiz-section');
   const demo = document.getElementById('demo-section');
-  score = 0; answered = new Set(); totalQuestions = 0;
+  score = 0; answered = new Set(); totalQuestions = 0; wrongAnswers = [];
   quiz.style.display = 'none'; quiz.innerHTML = '';
   progress.style.display = 'block'; skeleton.style.display = 'block'; demo.style.display = 'none';
   const fill = document.getElementById('progress-fill'); fill.style.width = '0%';
@@ -568,6 +568,7 @@ async function startRealQuiz(textContent) {
 
 // ===== Render Quiz =====
 function renderQuiz(data) {
+  currentQuizData = data;
   const section = document.getElementById('quiz-section');
   totalQuestions = data.questions.length;
   let html = `<div class="quiz-header"><h2>${data.title}</h2><div class="quiz-score" id="quiz-score">0 / ${totalQuestions}</div></div>`;
@@ -581,12 +582,12 @@ function renderQuiz(data) {
   section.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-let score = 0, answered = new Set(), totalQuestions = 0;
+let score = 0, answered = new Set(), totalQuestions = 0, wrongAnswers = [], currentQuizData = null;
 function selectAnswer(el, qi, oi, correct) {
   if (answered.has(qi)) return; answered.add(qi);
   const card = document.getElementById(`card-${qi}`);
   card.querySelectorAll('.q-option').forEach(opt => { opt.classList.add('disabled'); if (parseInt(opt.dataset.oi) === correct) opt.classList.add('correct'); });
-  if (oi !== correct) el.classList.add('wrong'); else score++;
+  if (oi !== correct) { el.classList.add('wrong'); wrongAnswers.push(qi); } else score++;
   document.getElementById('quiz-score').textContent = `${score} / ${totalQuestions}`;
   document.getElementById(`explain-${qi}`).style.display = 'block';
   if (answered.size === totalQuestions) setTimeout(() => showResultCard(), 600);
@@ -599,9 +600,20 @@ function showResultCard() {
   else if (pct >= 80) { msg = 'Great job! Almost perfect.'; emoji = '🎉'; }
   else if (pct >= 60) { msg = 'Not bad! Room for improvement.'; emoji = '💪'; }
   else { msg = 'Keep learning! Try watching the video again.'; emoji = '📚'; }
-  const html = `<div class="result-card"><div style="font-size:40px;margin-bottom:8px">${emoji}</div><div class="result-score">${score}/${totalQuestions}</div><div class="result-label">${pct}% correct</div><div class="result-msg">${msg}</div><div class="result-actions"><button class="result-btn primary" onclick="document.getElementById('text-input').value='';document.getElementById('text-input').focus();window.scrollTo({top:0,behavior:'smooth'})">Try another video</button><button class="result-btn secondary" onclick="window.scrollTo({top:document.getElementById('quiz-section').offsetTop,behavior:'smooth'})">Review answers</button></div></div>`;
+  const retryBtn = wrongAnswers.length > 0 ? `<button class="result-btn primary" onclick="retryWrongAnswers()">🔄 Retry ${wrongAnswers.length} wrong answer${wrongAnswers.length > 1 ? 's' : ''}</button>` : '';
+  const html = `<div class="result-card"><div style="font-size:40px;margin-bottom:8px">${emoji}</div><div class="result-score">${score}/${totalQuestions}</div><div class="result-label">${pct}% correct</div><div class="result-msg">${msg}</div><div class="result-actions">${retryBtn}<button class="result-btn ${wrongAnswers.length > 0 ? 'secondary' : 'primary'}" onclick="document.getElementById('text-input').value='';document.getElementById('text-input').focus();window.scrollTo({top:0,behavior:'smooth'})">Try another video</button><button class="result-btn secondary" onclick="window.scrollTo({top:document.getElementById('quiz-section').offsetTop,behavior:'smooth'})">Review answers</button></div></div>`;
   document.getElementById('quiz-section').insertAdjacentHTML('beforeend', html);
   document.querySelector('.result-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function retryWrongAnswers() {
+  if (!currentQuizData || wrongAnswers.length === 0) return;
+  const retryData = {
+    title: currentQuizData.title + ' — Retry',
+    questions: wrongAnswers.map(qi => currentQuizData.questions[qi])
+  };
+  score = 0; answered = new Set(); wrongAnswers = [];
+  renderQuiz(retryData);
 }
 
 // ===== FAQ Toggle =====

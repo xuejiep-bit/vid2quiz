@@ -138,7 +138,7 @@ footer a{color:var(--text-secondary);text-decoration:none;font-weight:500}footer
     <a href="/pdf-to-quiz.html">PDF to Quiz</a>
     <a href="/pdf-summarizer.html" class="active">PDF Summarizer</a>
   </div>
-  <div class="nav-credits"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg><span id="credits-display">5 free left today</span></div>
+  <div class="nav-credits"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg><span id="credits-display">Free &middot; Unlimited</span></div>
 </div></nav>
 
 <section class="hero">
@@ -221,7 +221,7 @@ footer a{color:var(--text-secondary);text-decoration:none;font-weight:500}footer
   <div class="faq-list">
     <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">What types of PDFs can I summarize?</button><div class="faq-answer"><p>Any text-based PDF works — research papers, textbook chapters, reports, articles, manuals, and study guides. Scanned image-only PDFs without selectable text may not work well. For best results, use PDFs where you can highlight and copy text.</p></div></div>
     <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Can it translate the summary into other languages?</button><div class="faq-answer"><p>Yes! Select your preferred language before generating the summary. We support 12+ languages including Chinese, Spanish, French, Japanese, Korean, German, Arabic, and more. The entire summary — key points, concepts, and takeaway — will be in your chosen language.</p></div></div>
-    <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Is the PDF summarizer free?</button><div class="faq-answer"><p>Yes. You get 5 free summaries per day without creating an account. No credit card or email required.</p></div></div>
+    <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Is the PDF summarizer free?</button><div class="faq-answer"><p>Yes. You get unlimited free summaries without creating an account. No credit card or email required.</p></div></div>
     <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Is my PDF data private?</button><div class="faq-answer"><p>Yes. Your PDF is processed entirely in your browser to extract text. Only the extracted text is sent to our AI for summarization. We never store your documents or summaries on our servers.</p></div></div>
     <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">How is this different from ChatGPT?</button><div class="faq-answer"><p>Our PDF summarizer gives you structured output — organized key points, defined concepts, and a clear takeaway. ChatGPT gives you a wall of text. We also handle PDF upload directly and support one-click translation, saving you time on formatting and copy-pasting.</p></div></div>
     <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Can I also generate quizzes from my PDFs?</button><div class="faq-answer"><p>Yes! Our <a href="/pdf-to-quiz.html" style="color:var(--accent)">PDF to Quiz Generator</a> turns any document into interactive multiple-choice quizzes. Great for testing your understanding after reading. You can also try our <a href="/" style="color:var(--accent)">YouTube to Quiz</a> tool for video content.</p></div></div>
@@ -246,7 +246,7 @@ footer a{color:var(--text-secondary);text-decoration:none;font-weight:500}footer
 
 <div class="modal-overlay" id="credit-modal"><div class="modal-box">
   <div class="modal-emoji">🧠</div><h3>You're on a roll!</h3>
-  <p>You've used all 5 free summaries today. Sign up to unlock 10 daily summaries and save your history.</p>
+  <p>This feature is coming soon. Create an account to save your summary history.</p>
   <button class="modal-btn" onclick="closeModal()">Create free account</button>
   <button class="modal-close" onclick="closeModal()">Maybe later</button>
 </div></div>
@@ -261,7 +261,7 @@ let lastReset = localStorage.getItem('v2q_reset') || '';
 const today = new Date().toDateString();
 if (lastReset !== today) { credits = 5; localStorage.setItem('v2q_credits', '5'); localStorage.setItem('v2q_reset', today); }
 updateCredits();
-function updateCredits() { document.getElementById('credits-display').textContent = credits > 0 ? `${credits} free left today` : 'No credits left'; }
+function updateCredits() { document.getElementById('credits-display').textContent = 'Free · Unlimited'; }
 function useCredit() { if (credits <= 0) return false; credits--; localStorage.setItem('v2q_credits', credits.toString()); updateCredits(); return true; }
 function updateCharCount() { document.getElementById('char-count').textContent = document.getElementById('text-input').value.length + ' characters'; }
 function showModal() { document.getElementById('credit-modal').classList.add('show'); }
@@ -310,7 +310,7 @@ async function processPDF(file) {
 async function generateSummary() {
   let text = activeTab === 'doc' ? extractedText : document.getElementById('text-input').value.trim();
   if (!text || text.length < 50) { alert('Please upload a PDF or paste at least a few sentences.'); return; }
-  if (!useCredit()) { showModal(); return; }
+  
 
   const language = document.getElementById('lang-select').value;
   const btn = document.getElementById('generate-btn'); btn.disabled = true;
